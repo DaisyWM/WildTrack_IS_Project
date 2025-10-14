@@ -353,3 +353,58 @@
   .or-divider::after { background: #333; }
   .or-divider span { color: #aaa; }
 }
+/* Role Selection Styles */
+.role-selection-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.role-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.role-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.role-card:hover {
+  border-color: #4CAF50;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+.role-card.selected {
+  border-color: #4CAF50;
+  background: rgba(76, 175, 80, 0.05);
+}
+
+.role-content {
+  text-align: center;
+}
+
+.role-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.role-card h3 {
+  margin: 0.5rem 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.role-card p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
