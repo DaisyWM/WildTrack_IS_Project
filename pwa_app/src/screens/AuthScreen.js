@@ -174,34 +174,51 @@ export default function AuthScreen({ onLogin, onSignup }) {
     }
   };
 
-  // ===== GOOGLE SIGN-IN (optional; safe placeholder if not configured) =====
-  const handleGoogleCredential = async (resp) => {
-    if (!resp?.credential) {
-      setMessage("❌ Google didn’t return a token");
+const handleGoogleCredential = async (resp) => {
+  if (!resp?.credential) {
+    setMessage("❌ Google didn't return a token");
+    return;
+  }
+  try {
+    setMessage("…signing in with Google");
+    const r = await fetch(`${API}/api/auth/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: resp.credential }),
+    });
+    const data = await r.json();
+    
+    // ADD THESE DEBUG LOGS:
+    console.log("🔍 Backend response:", data);
+    console.log("🔍 needsRoleSelection:", data.needsRoleSelection);
+    console.log("🔍 user.roleSelected:", data.user?.roleSelected);
+    
+    if (!r.ok) {
+      setMessage(data?.error || data?.message || "❌ Google sign-in failed");
       return;
     }
-    try {
-      setMessage("…signing in with Google");
-      const r = await fetch(`${API}/api/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken: resp.credential }),
-      });
-      const data = await r.json();
-      if (!r.ok) {
-        setMessage(data?.message || "❌ Google sign-in failed");
-        return;
-      }
+    
+    // Check if role selection is needed
+    if (data.needsRoleSelection) {
+      console.log("✅ SHOWING ROLE SELECTION!");
+      try {
+        localStorage.setItem("tempAuth", JSON.stringify(data));
+      } catch {}
+      setMessage("✅ Signed in! Please select your role.");
+      onLogin?.({ ...data, needsRoleSelection: true });
+    } else {
+      console.log("❌ Skipping role selection");
       try {
         localStorage.setItem("auth", JSON.stringify(data));
       } catch {}
       setMessage("✅ Signed in with Google!");
       onLogin?.(data);
-    } catch (e) {
-      console.error("[GOOGLE SIGN-IN] fetch failed:", e);
-      setMessage("⚠️ Could not reach server.");
     }
-  };
+  } catch (e) {
+    console.error("[GOOGLE SIGN-IN] fetch failed:", e);
+    setMessage("⚠️ Could not reach server.");
+  }
+};
 
   // Initialize + render Google buttons when tab changes; fallback to placeholder
   useEffect(() => {
@@ -313,7 +330,7 @@ export default function AuthScreen({ onLogin, onSignup }) {
                     <button
                       type="button"
                       className="auth-button"
-                      onClick={() => alert("Google sign-in coming soon")}
+                      onClick={() => alert("Google sign-in: Add REACT_APP_GOOGLE_CLIENT_ID to .env")}
                     >
                       Continue with Google
                     </button>
@@ -419,7 +436,7 @@ export default function AuthScreen({ onLogin, onSignup }) {
                 <button
                   type="button"
                   className="auth-button"
-                  onClick={() => alert("Google sign-in coming soon")}
+                  onClick={() => alert("Google sign-in: Add REACT_APP_GOOGLE_CLIENT_ID to .env")}
                 >
                   Continue with Google
                 </button>
