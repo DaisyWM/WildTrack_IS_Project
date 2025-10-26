@@ -31,6 +31,7 @@ const authRoutes = require("./routes/auth");
 const uploadsRoutes = require("./routes/uploads");
 const userRoutes = require("./routes/users");
 const twoFARoutes = require("./routes/2fa");
+const detectionsRoutes = require("./routes/detections"); // ADD THIS LINE
 
 const app = express();
 
@@ -59,6 +60,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/uploads", uploadsRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/detections", detectionsRoutes); // ADD THIS LINE
 
 // MFA routes (accessible via /api/2fa and /api/auth/mfa)
 app.use("/api/2fa", twoFARoutes);
