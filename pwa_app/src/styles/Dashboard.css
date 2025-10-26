@@ -193,6 +193,7 @@
 .view-all-alerts:hover {
   color: #0056b3;
 }
+
 /* Dashboard.css additions */
 .timeframe-toggle { display:flex; gap:.5rem; margin: 0 0 1rem }
 .timeframe-toggle button { padding:.4rem .8rem; border:1px solid #ddd; border-radius:8px; background:#fff; cursor:pointer }
@@ -223,4 +224,81 @@
   height: 200px;
   color: #999;
   font-style: italic;
+}
+
+/* --- Mobile drawer behavior + buttons --- */
+
+/* Hide hamburger on desktop; show on mobile via media query */
+.hamburger-btn {
+  display: none;
+  background: transparent;
+  color: #fff;
+  border: 0;
+  font-size: 22px;
+  line-height: 1;
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+/* Close button inside sidebar (hidden on desktop) */
+.close-sidebar {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  color: #fff;
+  border: 0;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Overlay when the drawer is open on mobile */
+.overlay {
+  position: fixed;
+  inset: 56px 0 0 0;              /* below top navbar height */
+  background: rgba(0,0,0,0.35);
+  z-index: 900;
+}
+
+/* Keep navbar above overlay/drawer */
+.top-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+}
+
+/* --- Mobile / tablet (<= 1024px) --- */
+@media (max-width: 1024px) {
+  .hamburger-btn { display: inline-flex; }
+
+  .main-area { position: relative; }
+
+  /* Sidebar becomes sliding drawer */
+  .sidebar {
+    position: fixed;
+    top: 56px;                    /* match your navbar height */
+    left: 0;
+    bottom: 0;
+    width: 80%;
+    max-width: 300px;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease-in-out;
+    z-index: 1000;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .close-sidebar { display: inline-block; }
+
+  /* Make content full-width on mobile */
+  .main-content {
+    padding: 16px;
+    overflow-y: auto;
+  }
+
+  /* Cards/charts stack better on small screens */
+  .summary-cards { flex-wrap: wrap; }
+  .card { min-width: 240px; }
 }
