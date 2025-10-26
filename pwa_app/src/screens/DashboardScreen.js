@@ -25,7 +25,10 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
   const [activeScreen, setActiveScreen] = useState("dashboard");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [timeframe, setTimeframe] = useState("7d"); // 24h | 7d | 30d
-  
+
+  // NEW: mobile drawer toggle
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   // Real data from API
   const [summary, setSummary] = useState({ totalDetections: 0, totalAlerts: 0, uploadsProcessed: 0 });
   const [timelineData, setTimelineData] = useState([]);
@@ -34,8 +37,14 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
   const [recentDetections, setRecentDetections] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  //const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+  // Auto-detect: use localhost on computer, IP address on phone
+  const hostname = window.location.hostname;
+  const API_URL = 
+    hostname === 'localhost' || hostname === '127.0.0.1'
+      ? "http://localhost:5000"
+      : "http://192.168.0.100:5000";
   // Read logged-in user from localStorage
   const auth = useMemo(() => {
     try { return JSON.parse(localStorage.getItem("auth")); } catch { return null; }
@@ -44,12 +53,20 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
   const name = user?.name || user?.username || "User";
   const role = user?.role || "unknown";
 
+  // 🆕 Check if we should auto-open alerts (from notification click)
+  useEffect(() => {
+    const openScreen = sessionStorage.getItem('openScreen');
+    if (openScreen === 'alerts') {
+      setActiveScreen('alerts');
+      sessionStorage.removeItem('openScreen'); // Clear it so it doesn't persist
+    }
+  }, []);
+
   // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch all stats
         const [summaryRes, timelineRes, speciesRes, alertRes, recentRes] = await Promise.all([
           fetch(`${API_URL}/api/stats/summary?timeframe=${timeframe}`),
           fetch(`${API_URL}/api/stats/detections-timeline?timeframe=${timeframe}`),
@@ -83,16 +100,17 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
     if (onLogout) onLogout();
     else { localStorage.removeItem("auth"); window.location.href = "/"; }
   };
-  const handleAlertsClick = () => setActiveScreen("alerts");
+  const handleAlertsClick = () => {
+    setActiveScreen("alerts");
+    setSidebarOpen(false); // close drawer on navigation (mobile)
+  };
 
   // Format labels based on timeframe
   const formatLabel = useCallback((label) => {
     if (timeframe === "24h") {
-      // Format: "2025-10-12 14:00" -> "14:00"
       const parts = label.split(" ");
       return parts[1] || label;
     } else {
-      // Format: "2025-10-12" -> "Oct 12"
       const date = new Date(label);
       return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     }
@@ -110,7 +128,16 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
     <div className="dashboard">
       {/* Top Navbar */}
       <div className="top-navbar">
+        <button
+          className="hamburger-btn"
+          aria-label="Open menu"
+          onClick={() => setSidebarOpen(true)}
+        >
+          ☰
+        </button>
+
         <div className="logo">WildTrack</div>
+
         <div className="right-side">
           <div className="profile-name" onClick={() => setDropdownOpen(!dropdownOpen)}>
             {name} ({role}) ⌄
@@ -125,17 +152,41 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
         </div>
       </div>
 
+      {/* Overlay for mobile */}
+      {sidebarOpen && <div className="overlay" onClick={() => setSidebarOpen(false)} />}
+
       {/* Main area: Sidebar + Main Content */}
       <div className="main-area">
         {/* Sidebar */}
-        <aside className="sidebar">
+        <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+          <button className="close-sidebar" onClick={() => setSidebarOpen(false)}>✕</button>
           <h2>{title}</h2>
           <nav>
             <ul>
-              <li onClick={() => setActiveScreen("dashboard")} className={activeScreen === "dashboard" ? "active" : ""}>Dashboard</li>
-              <li onClick={() => setActiveScreen("uploads")} className={activeScreen === "uploads" ? "active" : ""}>Uploads</li>
-              <li onClick={handleAlertsClick} className={activeScreen === "alerts" ? "active" : ""}>Alerts</li>
-              <li onClick={() => setActiveScreen("settings")} className={activeScreen === "settings" ? "active" : ""}>Settings</li>
+              <li
+                onClick={() => { setActiveScreen("dashboard"); setSidebarOpen(false); }}
+                className={activeScreen === "dashboard" ? "active" : ""}
+              >
+                Dashboard
+              </li>
+              <li
+                onClick={() => { setActiveScreen("uploads"); setSidebarOpen(false); }}
+                className={activeScreen === "uploads" ? "active" : ""}
+              >
+                Uploads
+              </li>
+              <li
+                onClick={handleAlertsClick}
+                className={activeScreen === "alerts" ? "active" : ""}
+              >
+                Alerts
+              </li>
+              <li
+                onClick={() => { setActiveScreen("settings"); setSidebarOpen(false); }}
+                className={activeScreen === "settings" ? "active" : ""}
+              >
+                Settings
+              </li>
             </ul>
           </nav>
         </aside>
@@ -145,7 +196,6 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
           {activeScreen === "dashboard" && (
             <>
               {loading && <div className="loading">Loading stats...</div>}
-              
               {!loading && (
                 <>
                   {/* Summary Cards - REAL DATA */}
@@ -265,8 +315,8 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
                       <ul>
                         {recentDetections.map((det, idx) => (
                           <li key={idx}>
-                            <img 
-                              src={det.image ? `${API_URL}${det.image}` : "https://via.placeholder.com/40"} 
+                            <img
+                              src={det.image ? `${API_URL}${det.image}` : "https://via.placeholder.com/40"}
                               alt={det.species}
                               onError={(e) => e.target.src = "https://via.placeholder.com/40"}
                             />
@@ -281,7 +331,7 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
 
                   {/* Quick Actions */}
                   <div className="quick-actions">
-                    <button className="upload-btn" onClick={() => setActiveScreen("uploads")}>+ Quick Upload</button>
+                    <button className="upload-btn" onClick={() => { setActiveScreen("uploads"); setSidebarOpen(false); }}>+ Quick Upload</button>
                     <button className="alerts-btn" onClick={handleAlertsClick}>View All Alerts</button>
                   </div>
 

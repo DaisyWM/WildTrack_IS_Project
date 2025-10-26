@@ -4,16 +4,19 @@ import React, { useEffect, useState } from "react";
 
 import AuthScreen from "./screens/AuthScreen";
 import RoleSelection from "./screens/RoleSelection";
-import DashboardScreen from "./screens/DashboardScreen"; // ← Farmer dashboard
+import DashboardScreen from "./screens/DashboardScreen";
 import AlertScreen from "./screens/AlertScreen";
 import RangerDashboard from "./screens/RangerDashboard";
 import AdminDashboard from "./screens/AdminDashboard";
+import NotificationPermission from "./components/NotificationPermission";
+import { checkForNewDetections } from "./utils/notifications";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [needsRoleSelection, setNeedsRoleSelection] = useState(false);
-  const [activeScreen, setActiveScreen] = useState("dashboard"); // "dashboard" | "alerts"
-  const [role, setRole] = useState(null); // "farmer" | "ranger" | "admin"
+  const [activeScreen, setActiveScreen] = useState("dashboard");
+  const [role, setRole] = useState(null);
+  const [lastDetectionId, setLastDetectionId] = useState(0);
 
   // Hydrate from localStorage on first load
   useEffect(() => {
@@ -36,6 +39,49 @@ export default function App() {
       // ignore parse errors
     }
   }, []);
+
+  // 🆕 Check URL parameters for navigation (e.g., from notification click)
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const screen = params.get('screen');
+    
+    if (screen === 'alerts') {
+      // Store this so dashboards can check it
+      sessionStorage.setItem('openScreen', 'alerts');
+      
+      // Clear URL parameter without reloading
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [isLoggedIn]);
+
+  // Auto-check for new detections
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    // Load last seen detection ID from localStorage
+    const savedId = localStorage.getItem('lastDetectionId');
+    if (savedId) {
+      setLastDetectionId(parseInt(savedId));
+    }
+
+    // Check for new detections every 30 seconds
+    const interval = setInterval(() => {
+      checkForNewDetections(lastDetectionId, (newId) => {
+        setLastDetectionId(newId);
+        localStorage.setItem('lastDetectionId', newId.toString());
+      });
+    }, 30000); // 30 seconds
+
+    // Initial check on mount
+    checkForNewDetections(lastDetectionId, (newId) => {
+      setLastDetectionId(newId);
+      localStorage.setItem('lastDetectionId', newId.toString());
+    });
+
+    return () => clearInterval(interval);
+  }, [lastDetectionId, isLoggedIn]);
 
   // Called by AuthScreen after successful login/signup
   const handleAuthSuccess = (data) => {
@@ -97,7 +143,7 @@ export default function App() {
     );
   }
 
-  // Choose dashboard by role (Farmer uses your existing DashboardScreen)
+  // Choose dashboard by role
   const renderDashboardByRole = () => {
     if (role === "admin") {
       return (
@@ -123,6 +169,7 @@ export default function App() {
 
   return (
     <div className="App">
+      <NotificationPermission />
       {renderDashboardByRole()}
     </div>
   );

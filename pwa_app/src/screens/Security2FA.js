@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
+import PushSubscribeButton from "../components/PushSubscribeButton";
 
+/**
+ * Security2FA (with Notifications control)
+ * - Keeps your existing 2FA logic
+ * - Adds UI and logic to unsubscribe from push notifications
+ */
 export default function Security2FA() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ enabled: false, method: null });
@@ -14,6 +20,9 @@ export default function Security2FA() {
   
   const [msg, setMsg] = useState("");
   const [step, setStep] = useState(1); // 1: select method, 2: setup/verify
+
+  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [checkingSub, setCheckingSub] = useState(true); // show small spinner if needed
 
   const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
@@ -45,6 +54,38 @@ export default function Security2FA() {
   useEffect(() => {
     fetchStatus();
   }, [token]); // eslint-disable-line
+
+  // Check existing push subscription status (for UI)
+  useEffect(() => {
+    let mounted = true;
+    async function checkSubscription() {
+      setCheckingSub(true);
+      try {
+        if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+          if (mounted) setPushSubscribed(false);
+          return;
+        }
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        if (mounted) setPushSubscribed(Boolean(sub));
+      } catch (err) {
+        console.error("Failed to check push subscription:", err);
+        if (mounted) setPushSubscribed(false);
+      } finally {
+        if (mounted) setCheckingSub(false);
+      }
+    }
+    checkSubscription();
+
+    // Listen for a custom event so UI updates after subscribing/unsubscribing elsewhere
+    const handler = () => checkSubscription();
+    window.addEventListener("push-subscription-updated", handler);
+
+    return () => {
+      mounted = false;
+      window.removeEventListener("push-subscription-updated", handler);
+    };
+  }, []);
 
   // === AUTHENTICATOR APP SETUP ===
   const handleGenerateAuthenticator = async () => {
@@ -175,6 +216,62 @@ export default function Security2FA() {
       handleGenerateAuthenticator();
     } else if (method === "email") {
       handleSendEmailOTP();
+    }
+  };
+
+  // === UNSUBSCRIBE (Disable) push notifications ===
+  const handleUnsubscribe = async () => {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+      alert("Push notifications are not supported in this browser.");
+      return;
+    }
+
+    if (!window.confirm("Unsubscribe from push notifications on this device?")) return;
+
+    try {
+      setCheckingSub(true);
+
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        setPushSubscribed(false);
+        alert("No active subscription found.");
+        return;
+      }
+
+      // Inform backend to remove subscription
+      const res = await fetch(`${API}/api/push/unsubscribe`, {        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sub),
+      });
+
+      const json = await res.json().catch(() => ({}));
+
+      // Attempt client side unsubscribe
+      const unsubbed = await sub.unsubscribe().catch(err => {
+        console.warn("Error unsubscribing client-side:", err);
+        return false;
+      });
+
+      // Update UI & dispatch event for other components
+      setPushSubscribed(false);
+      window.dispatchEvent(new Event("push-subscription-updated"));
+
+      if (res.ok && json.success) {
+        alert("✅ Unsubscribed from push notifications.");
+      } else {
+        // still show success if client unsubbed
+        if (unsubbed) {
+          alert("✅ Unsubscribed locally. Server may have already removed subscription.");
+        } else {
+          alert("Unsubscribe completed (local). The server response: " + (json.message || JSON.stringify(json)));
+        }
+      }
+    } catch (err) {
+      console.error("Failed to unsubscribe:", err);
+      alert("Failed to unsubscribe — check console for details.");
+    } finally {
+      setCheckingSub(false);
     }
   };
 
@@ -360,6 +457,43 @@ export default function Security2FA() {
             )}
           </>
         )}
+
+        {/* Notifications control - placed inside Settings near 2FA */}
+        <div style={{ marginTop: 24, paddingTop: 16, borderTop: "1px solid #eee" }}>
+          <h3 style={{ marginTop: 0 }}>Notifications</h3>
+          <p style={{ marginTop: 0, marginBottom: 12, color: "#555" }}>
+            Enable browser push notifications to receive real-time wildlife alerts on this device.
+          </p>
+
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            {/* Subscribe button (registers service worker, requests permission, sends subscription to backend) */}
+            <PushSubscribeButton />
+
+            {/* Unsubscribe button - visible only when subscribed */}
+            <div>
+              <button
+                onClick={handleUnsubscribe}
+                disabled={checkingSub}
+                style={{
+                  background: pushSubscribed ? "#e53e3e" : "#e2e8f0",
+                  color: pushSubscribed ? "#fff" : "#374151",
+                  border: "none",
+                  padding: "0.5rem 0.9rem",
+                  borderRadius: 6,
+                  cursor: pushSubscribed ? "pointer" : "not-allowed"
+                }}
+                title={pushSubscribed ? "Unsubscribe from push notifications" : "No active subscription"}
+              >
+                {checkingSub ? "…" : (pushSubscribed ? "Disable Notifications" : "Disabled")}
+              </button>
+            </div>
+
+            {/* Status text */}
+            <div style={{ fontSize: 14, color: pushSubscribed ? "#16a34a" : "#6b7280" }}>
+              {pushSubscribed ? "Enabled" : "Disabled"}
+            </div>
+          </div>
+        </div>
 
         {/* Message Display */}
         {msg && (

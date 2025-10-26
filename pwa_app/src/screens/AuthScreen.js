@@ -17,12 +17,17 @@ export default function AuthScreen({ onLogin, onSignup }) {
   const [mfaStage, setMfaStage] = useState({ required: false, tempToken: null });
   const [otp, setOtp] = useState("");
 
-  // === ENV & API ===
-  const API =
-    (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) ||
-    process.env.REACT_APP_API_URL ||
-    "http://localhost:5000";
+// === ENV & API ===
+  // Auto-detect: use localhost on computer, IP address on phone
+  const hostname = window.location.hostname;
+  const API = 
+    hostname === 'localhost' || hostname === '127.0.0.1'
+      ? "http://localhost:5000"
+      : "http://192.168.0.100:5000";  // Use your current IP
 
+  console.log("🔍 hostname:", hostname);
+  console.log("🔍 API URL:", API);
+  
   const GOOGLE_CLIENT_ID =
     (typeof import.meta !== "undefined" && import.meta.env?.VITE_GOOGLE_CLIENT_ID) ||
     process.env.REACT_APP_GOOGLE_CLIENT_ID;
