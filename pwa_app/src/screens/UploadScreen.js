@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { API_BASE } from '../config/pushConfig';
+import { API_BASE, getHeaders } from '../config/pushConfig';
 import "../styles/Upload.css";
 
 const UploadScreen = () => {
@@ -67,8 +67,17 @@ const UploadScreen = () => {
         setError("Network error. Please check your connection.");
       });
 
-      // Send request
+      // Send request with ngrok bypass header
       xhr.open("POST", `${API_URL}/api/uploads`);
+      
+      // Add headers from getHeaders() to bypass ngrok warning
+      const headers = getHeaders();
+      Object.keys(headers).forEach(key => {
+        if (key !== 'Content-Type') { // Don't set Content-Type for FormData
+          xhr.setRequestHeader(key, headers[key]);
+        }
+      });
+      
       xhr.send(formData);
 
     } catch (err) {

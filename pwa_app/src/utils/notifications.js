@@ -1,4 +1,4 @@
-import { API_BASE } from '../config/pushConfig';
+import { API_BASE, getHeaders } from '../config/pushConfig';
 
 // Helper function to send push notification
 export function sendDetectionNotification(detection) {
@@ -35,7 +35,9 @@ export function sendDetectionNotification(detection) {
 // Check for new detections periodically
 export async function checkForNewDetections(lastSeenId, onNewDetection) {
   try {
-    const response = await fetch(`${API_BASE}/api/detections/history`);
+    const response = await fetch(`${API_BASE}/api/detections/history`, {
+      headers: getHeaders()
+    });
     const detections = await response.json();
     
     // Backend now returns array directly

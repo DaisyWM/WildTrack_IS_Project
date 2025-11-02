@@ -1,7 +1,7 @@
 // pwa_app/src/screens/AuthScreen.js
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/AuthScreen.css";
-import { API_BASE } from '../config/pushConfig';
+import { API_BASE, getHeaders } from '../config/pushConfig';
 
 export default function AuthScreen({ onLogin, onSignup }) {
   const [activeTab, setActiveTab] = useState("signup"); // "login" | "signup"
@@ -18,11 +18,8 @@ export default function AuthScreen({ onLogin, onSignup }) {
   const [mfaStage, setMfaStage] = useState({ required: false, tempToken: null });
   const [otp, setOtp] = useState("");
 
-// === ENV & API ===
+  // === ENV & API ===
   const API = API_BASE;
-
-//  console.log("🔍 hostname:", hostname);
-//   console.log("🔍 API URL:", API);
   
   const GOOGLE_CLIENT_ID =
     (typeof import.meta !== "undefined" && import.meta.env?.VITE_GOOGLE_CLIENT_ID) ||
@@ -60,7 +57,7 @@ export default function AuthScreen({ onLogin, onSignup }) {
     try {
       const res = await fetch(`${API}/api/auth/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getHeaders(),
         body: JSON.stringify(loginForm),
       });
 
@@ -109,7 +106,7 @@ export default function AuthScreen({ onLogin, onSignup }) {
     try {
       const res = await fetch(`${API}/api/auth/mfa/verify`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getHeaders(),
         body: JSON.stringify({ code: otp, tempToken: mfaStage.tempToken }),
       });
 
@@ -142,7 +139,7 @@ export default function AuthScreen({ onLogin, onSignup }) {
     try {
       const res = await fetch(`${API}/api/auth/signup`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getHeaders(),
         body: JSON.stringify({
           username: signupForm.name, // backend expects "username"
           email: signupForm.email,
@@ -175,51 +172,50 @@ export default function AuthScreen({ onLogin, onSignup }) {
     }
   };
 
-const handleGoogleCredential = async (resp) => {
-  if (!resp?.credential) {
-    setMessage("❌ Google didn't return a token");
-    return;
-  }
-  try {
-    setMessage("…signing in with Google");
-    const r = await fetch(`${API}/api/auth/google`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: resp.credential }),
-    });
-    const data = await r.json();
-    
-    // ADD THESE DEBUG LOGS:
-    console.log("🔍 Backend response:", data);
-    console.log("🔍 needsRoleSelection:", data.needsRoleSelection);
-    console.log("🔍 user.roleSelected:", data.user?.roleSelected);
-    
-    if (!r.ok) {
-      setMessage(data?.error || data?.message || "❌ Google sign-in failed");
+  const handleGoogleCredential = async (resp) => {
+    if (!resp?.credential) {
+      setMessage("❌ Google didn't return a token");
       return;
     }
-    
-    // Check if role selection is needed
-    if (data.needsRoleSelection) {
-      console.log("✅ SHOWING ROLE SELECTION!");
-      try {
-        localStorage.setItem("tempAuth", JSON.stringify(data));
-      } catch {}
-      setMessage("✅ Signed in! Please select your role.");
-      onLogin?.({ ...data, needsRoleSelection: true });
-    } else {
-      console.log("❌ Skipping role selection");
-      try {
-        localStorage.setItem("auth", JSON.stringify(data));
-      } catch {}
-      setMessage("✅ Signed in with Google!");
-      onLogin?.(data);
+    try {
+      setMessage("…signing in with Google");
+      const r = await fetch(`${API}/api/auth/google`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({ token: resp.credential }),
+      });
+      const data = await r.json();
+      
+      console.log("🔍 Backend response:", data);
+      console.log("🔍 needsRoleSelection:", data.needsRoleSelection);
+      console.log("🔍 user.roleSelected:", data.user?.roleSelected);
+      
+      if (!r.ok) {
+        setMessage(data?.error || data?.message || "❌ Google sign-in failed");
+        return;
+      }
+      
+      // Check if role selection is needed
+      if (data.needsRoleSelection) {
+        console.log("✅ SHOWING ROLE SELECTION!");
+        try {
+          localStorage.setItem("tempAuth", JSON.stringify(data));
+        } catch {}
+        setMessage("✅ Signed in! Please select your role.");
+        onLogin?.({ ...data, needsRoleSelection: true });
+      } else {
+        console.log("❌ Skipping role selection");
+        try {
+          localStorage.setItem("auth", JSON.stringify(data));
+        } catch {}
+        setMessage("✅ Signed in with Google!");
+        onLogin?.(data);
+      }
+    } catch (e) {
+      console.error("[GOOGLE SIGN-IN] fetch failed:", e);
+      setMessage("⚠️ Could not reach server.");
     }
-  } catch (e) {
-    console.error("[GOOGLE SIGN-IN] fetch failed:", e);
-    setMessage("⚠️ Could not reach server.");
-  }
-};
+  };
 
   // Initialize + render Google buttons when tab changes; fallback to placeholder
   useEffect(() => {

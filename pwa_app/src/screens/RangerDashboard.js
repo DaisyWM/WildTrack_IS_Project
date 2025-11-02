@@ -18,7 +18,7 @@ import {
 import "../styles/Dashboard.css";
 import Security2FA from "./Security2FA";
 import AlertScreen from "./AlertScreen";
-import { API_BASE } from '../config/pushConfig';
+import { API_BASE, getHeaders } from '../config/pushConfig';
 
 export default function RangerDashboard({ onLogout }) {
   const [activeScreen, setActiveScreen] = useState("dashboard");
@@ -63,10 +63,18 @@ export default function RangerDashboard({ onLogout }) {
       setLoading(true);
       try {
         const [summaryRes, timelineRes, speciesRes, alertRes] = await Promise.all([
-          fetch(`${API_URL}/api/stats/summary?timeframe=${timeframe}&dangerOnly=true`),
-          fetch(`${API_URL}/api/stats/detections-timeline?timeframe=${timeframe}`),
-          fetch(`${API_URL}/api/stats/species-breakdown?dangerOnly=true`),
-          fetch(`${API_URL}/api/stats/alert-outcomes`),
+          fetch(`${API_URL}/api/stats/summary?timeframe=${timeframe}&dangerOnly=true`, {
+            headers: getHeaders()
+          }),
+          fetch(`${API_URL}/api/stats/detections-timeline?timeframe=${timeframe}`, {
+            headers: getHeaders()
+          }),
+          fetch(`${API_URL}/api/stats/species-breakdown?dangerOnly=true`, {
+            headers: getHeaders()
+          }),
+          fetch(`${API_URL}/api/stats/alert-outcomes`, {
+            headers: getHeaders()
+          }),
         ]);
 
         const summaryData = summaryRes.ok ? await summaryRes.json() : {};
