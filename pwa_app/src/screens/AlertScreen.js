@@ -177,7 +177,7 @@ export default function AlertScreen({ goBack }) {
             <li key={alert.id} className={`alert-item alert-${alert.alertLevel}`}>
               <div className="alert-image">
                 <img
-                  src={`${API_BASE}${alert.snapshot}`}
+                  src={`${API_BASE}${alert.snapshot}?ngrok-skip-browser-warning=true`}
                   alt={`${alert.animal} detection`}
                   onError={(e) => {
                     e.target.src =
