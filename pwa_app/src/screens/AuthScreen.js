@@ -1,6 +1,7 @@
 // pwa_app/src/screens/AuthScreen.js
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/AuthScreen.css";
+import { API_BASE } from '../config/pushConfig';
 
 export default function AuthScreen({ onLogin, onSignup }) {
   const [activeTab, setActiveTab] = useState("signup"); // "login" | "signup"
@@ -18,15 +19,10 @@ export default function AuthScreen({ onLogin, onSignup }) {
   const [otp, setOtp] = useState("");
 
 // === ENV & API ===
-  // Auto-detect: use localhost on computer, IP address on phone
-  const hostname = window.location.hostname;
-  const API = 
-    hostname === 'localhost' || hostname === '127.0.0.1'
-      ? "http://localhost:5000"
-      : "http://192.168.0.100:5000";  // Use your current IP
+  const API = API_BASE;
 
-  console.log("🔍 hostname:", hostname);
-  console.log("🔍 API URL:", API);
+//  console.log("🔍 hostname:", hostname);
+//   console.log("🔍 API URL:", API);
   
   const GOOGLE_CLIENT_ID =
     (typeof import.meta !== "undefined" && import.meta.env?.VITE_GOOGLE_CLIENT_ID) ||

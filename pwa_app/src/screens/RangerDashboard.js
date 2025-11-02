@@ -18,6 +18,7 @@ import {
 import "../styles/Dashboard.css";
 import Security2FA from "./Security2FA";
 import AlertScreen from "./AlertScreen";
+import { API_BASE } from '../config/pushConfig';
 
 export default function RangerDashboard({ onLogout }) {
   const [activeScreen, setActiveScreen] = useState("dashboard");
@@ -35,11 +36,7 @@ export default function RangerDashboard({ onLogout }) {
   const [loading, setLoading] = useState(true);
 
   // Auto-detect: use localhost on computer, IP address on phone
-  const hostname = window.location.hostname;
-  const API_URL = 
-    hostname === 'localhost' || hostname === '127.0.0.1'
-      ? "http://localhost:5000"
-      : "http://192.168.0.100:5000";
+  const API_URL = API_BASE;
 
   // Auth / user
   const auth = useMemo(() => {
@@ -118,6 +115,62 @@ export default function RangerDashboard({ onLogout }) {
   const gotoSettings = () => { setActiveScreen("settings"); setDropdownOpen(false); };
 
   // --- Render ---
+  // If Settings page selected, render Security2FA
+  if (activeScreen === "settings") {
+    return (
+      <div className="dashboard">
+        <div className="top-navbar">
+          <button className="hamburger-btn" aria-label="Open menu" onClick={() => setSidebarOpen(true)}>☰</button>
+          <div className="logo">WildTrack</div>
+          <div className="right-side">
+            <div className="welcome-message">Ranger / KWS Ops</div>
+            <div className="profile-name" onClick={() => setDropdownOpen(!dropdownOpen)}>{name} ({role}) ⌄</div>
+            {dropdownOpen && (
+              <ul className="dropdown-menu">
+                <li>Profile</li>
+                <li onClick={gotoSettings}>Settings</li>
+                <li className="logout" onClick={onLogout}>Logout</li>
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {sidebarOpen && <div className="overlay" onClick={() => setSidebarOpen(false)} />}
+
+        <div className="main-area">
+          <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+            <button className="close-sidebar" onClick={() => setSidebarOpen(false)}>✕</button>
+            <h2>Ranger Menu</h2>
+            <nav>
+              <ul>
+                <li className={activeScreen === "dashboard" ? "active" : ""} 
+                    onClick={() => { setActiveScreen("dashboard"); setSidebarOpen(false); }}>
+                  Dashboard
+                </li>
+                <li className={activeScreen === "alerts" ? "active" : ""} 
+                    onClick={() => { setActiveScreen("alerts"); setSidebarOpen(false); }}>
+                  Alerts
+                </li>
+                <li className={activeScreen === "reports" ? "active" : ""} 
+                    onClick={() => { setActiveScreen("reports"); setSidebarOpen(false); }}>
+                  Reports
+                </li>
+                <li className={activeScreen === "settings" ? "active" : ""} 
+                    onClick={() => { gotoSettings(); setSidebarOpen(false); }}>
+                  Settings
+                </li>
+              </ul>
+            </nav>
+          </aside>
+
+          <main className="main-content">
+            <Security2FA goBack={() => setActiveScreen("dashboard")} />
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   // If Alerts page selected, render AlertScreen
   if (activeScreen === "alerts") {
     return (
@@ -144,7 +197,6 @@ export default function RangerDashboard({ onLogout }) {
           <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
             <button className="close-sidebar" onClick={() => setSidebarOpen(false)}>✕</button>
             <h2>Ranger Menu</h2>
-            {/* 🆕 CLEANED SIDEBAR - No duplicate alert items */}
             <nav>
               <ul>
                 <li className={activeScreen === "dashboard" ? "active" : ""} 
@@ -168,7 +220,6 @@ export default function RangerDashboard({ onLogout }) {
           </aside>
 
           <main className="main-content">
-            {/* AlertScreen now has filters inside it */}
             <AlertScreen goBack={() => setActiveScreen("dashboard")} />
           </main>
         </div>
@@ -202,7 +253,6 @@ export default function RangerDashboard({ onLogout }) {
         <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
           <button className="close-sidebar" onClick={() => setSidebarOpen(false)}>✕</button>
           <h2>Ranger Menu</h2>
-          {/* 🆕 CLEANED SIDEBAR */}
           <nav>
             <ul>
               <li className={activeScreen === "dashboard" ? "active" : ""} 

@@ -24,19 +24,19 @@ self.addEventListener('push', function(event) {
     // Determine vibration pattern based on alert level
     const isHighAlert = data.data?.alert_level === 'high';
     const vibrationPattern = isHighAlert 
-      ? [200, 100, 200, 100, 200, 100, 200] // Longer, more urgent
+      ? [200, 100, 200, 100, 200] // Shorter vibration
       : [200, 100, 200];
     
     const options = {
       body: data.body,
       icon: data.icon || '/logo192.png',
       badge: data.badge || '/logo192.png',
-      image: data.data?.image, // 🆕 Show snapshot image
+      image: data.data?.image, // Show snapshot image
       data: data.data,
       vibrate: vibrationPattern,
-      tag: data.tag || data.data?.tag || 'wildlife-detection',
-      requireInteraction: data.requireInteraction || isHighAlert, // High alerts stay
-      actions: [ // 🆕 Add action buttons
+      tag: data.data?.species || 'wildlife-detection', // 🆕 Use species as tag to prevent duplicates
+      requireInteraction: false, // 🆕 CHANGED: Allow closing all notifications
+      actions: [
         {
           action: 'view',
           title: 'View Details',
@@ -47,9 +47,8 @@ self.addEventListener('push', function(event) {
           title: 'Dismiss'
         }
       ],
-      // 🆕 Visual priority for high alerts
       silent: false,
-      renotify: isHighAlert // Re-alert if same tag
+      renotify: false // 🆕 CHANGED: Don't re-alert for same species
     };
 
     event.waitUntil(
@@ -71,24 +70,28 @@ self.addEventListener('notificationclick', function(event) {
     return;
   }
   
-  // Get the URL to open (default to home page)
-  const urlToOpen = notificationData.url || self.location.origin;
-  
-  // Default action or 'view' action - open the app
+  // Default action or 'view' action - open the app to alerts page
   event.waitUntil(
     clients.matchAll({ 
       type: 'window',
       includeUncontrolled: true 
     }).then(function(clientList) {
-      // If a window is already open, focus it
+      // If a window is already open, focus it and navigate to alerts
       for (let i = 0; i < clientList.length; i++) {
         const client = clientList[i];
-        if (client.url.indexOf(self.location.origin) !== -1 && 'focus' in client) {
+        if (client.url.indexOf(self.location.origin) !== -1) {
+          // Tell the client to open the alerts screen
+          client.postMessage({
+            type: 'OPEN_ALERTS',
+            data: notificationData
+          });
           return client.focus();
         }
       }
-      // If no window is open, open a new one
+      // If no window is open, open a new one with alerts page
       if (clients.openWindow) {
+        // Add query parameter to auto-open alerts
+        const urlToOpen = self.location.origin + '/?openAlerts=true';
         return clients.openWindow(urlToOpen);
       }
     }).catch(function(error) {

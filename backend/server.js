@@ -3,6 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const path = require("path");
 require("dotenv").config();
 const statsRoutes = require("./routes/stats");
 
@@ -24,6 +26,8 @@ console.log("Loaded env keys:", {
   GOOGLE_CLIENT_ID: !!GOOGLE_CLIENT_ID,
   FRONTEND_URL,
   FRONTEND_URL_ALT,
+  VAPID_PUBLIC_KEY: !!process.env.VAPID_PUBLIC_KEY,
+  VAPID_PRIVATE_KEY: !!process.env.VAPID_PRIVATE_KEY,
 });
 
 // Import route files
@@ -31,20 +35,24 @@ const authRoutes = require("./routes/auth");
 const uploadsRoutes = require("./routes/uploads");
 const userRoutes = require("./routes/users");
 const twoFARoutes = require("./routes/2fa");
-const detectionsRoutes = require("./routes/detections"); // ADD THIS LINE
+const pushRoutes = require("./routes/push");
 
 const app = express();
 
 // ---------- Middleware ----------
-// FIXED CORS - Allow all localhost ports
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
       "http://localhost:3001",
       "http://localhost:5173",
+      // Add Vercel domains (regex to match any Vercel subdomain)
+      /https:\/\/.*\.vercel\.app$/,
+      // Add ngrok domains (regex to match any ngrok subdomain)
+      /https:\/\/.*\.ngrok-free\.app$/,
+      /https:\/\/.*\.ngrok\.app$/,
       FRONTEND_URL,
-      FRONTEND_URL_ALT
+      FRONTEND_URL_ALT,
     ].filter(Boolean),
     credentials: true,
   })
@@ -60,11 +68,40 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/uploads", uploadsRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/detections", detectionsRoutes); // ADD THIS LINE
 
 // MFA routes (accessible via /api/2fa and /api/auth/mfa)
 app.use("/api/2fa", twoFARoutes);
 app.use("/api/auth/mfa", twoFARoutes);
+
+// Push notification routes
+app.use("/api/push", pushRoutes);
+
+// GET detection history
+app.get("/api/detections/history", (req, res) => {
+  const historyPath = path.join(__dirname, "detection_history.json");
+
+  // Check if history file exists
+  if (!fs.existsSync(historyPath)) {
+    return res.json({ success: true, detections: [] });
+  }
+
+  // Read and return history
+  try {
+    const historyData = fs.readFileSync(historyPath, "utf8");
+    const history = JSON.parse(historyData);
+
+    res.json({
+      success: true,
+      detections: history,
+    });
+  } catch (error) {
+    console.error("Error reading history:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to load detection history",
+    });
+  }
+});
 
 // Serve snapshots folder as static files
 app.use("/snapshots", express.static("snapshots"));
