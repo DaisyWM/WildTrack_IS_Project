@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { API_BASE } from '../config/pushConfig';
+import { API_BASE, getHeaders } from '../config/pushConfig';
 import "../styles/Alert.css";
 
 export default function AlertScreen({ goBack }) {
@@ -14,7 +14,9 @@ export default function AlertScreen({ goBack }) {
   useEffect(() => {
     const fetchAlerts = () => {
       // Use the SAME endpoint that works for dashboard
-      fetch(`${API_BASE}/api/stats/recent-detections?limit=50`)
+      fetch(`${API_BASE}/api/stats/recent-detections?limit=50`, {
+        headers: getHeaders()
+      })
         .then((res) => res.json())
         .then((response) => {
           console.log('🔍 Received data:', response);
