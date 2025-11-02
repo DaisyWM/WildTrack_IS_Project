@@ -40,14 +40,29 @@ export default function App() {
     }
   }, []);
 
+  // 🆕 Listen for messages from service worker (notification clicks)
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data.type === 'OPEN_ALERTS') {
+          // Set session storage to open alerts
+          sessionStorage.setItem('openScreen', 'alerts');
+          // Force reload to apply the change
+          window.location.reload();
+        }
+      });
+    }
+  }, []);
+
   // 🆕 Check URL parameters for navigation (e.g., from notification click)
   useEffect(() => {
     if (!isLoggedIn) return;
 
     const params = new URLSearchParams(window.location.search);
     const screen = params.get('screen');
+    const openAlerts = params.get('openAlerts');
     
-    if (screen === 'alerts') {
+    if (screen === 'alerts' || openAlerts === 'true') {
       // Store this so dashboards can check it
       sessionStorage.setItem('openScreen', 'alerts');
       

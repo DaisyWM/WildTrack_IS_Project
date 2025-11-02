@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_BASE } from '../config/pushConfig';
 import "../styles/Upload.css";
 
 const UploadScreen = () => {
@@ -8,8 +9,8 @@ const UploadScreen = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  // Get API URL from environment or default to localhost
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  // Use centralized API_BASE from config
+  const API_URL = API_BASE;
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { API_BASE } from '../config/pushConfig';
 import "../styles/Alert.css";
 
 export default function AlertScreen({ goBack }) {
@@ -10,63 +11,57 @@ export default function AlertScreen({ goBack }) {
   const [filterPriority, setFilterPriority] = useState("all"); // "all" | "high" | "medium"
   const [filterSpecies, setFilterSpecies] = useState("all"); // "all" | specific species
 
-  // Auto-detect: use localhost on computer, IP address on phone
-  const hostname = window.location.hostname;
-  const API_BASE = 
-    hostname === 'localhost' || hostname === '127.0.0.1'
-      ? "http://localhost:5000"
-      : "http://192.168.0.100:5000";
-
   useEffect(() => {
-    // Fetch detection history from backend
-    fetch(`${API_BASE}/api/detections/history`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          // Transform detections into alert format
-          const formattedAlerts = data.detections.map((detection) => {
-            const primarySpecies =
-              detection.snapshot.detections[0]?.species || "Unknown";
-            const confidence =
-              detection.snapshot.detections[0]?.confidence || 0;
-            const alertLevel = detection.snapshot.alert_level;
+    const fetchAlerts = () => {
+      // Use the SAME endpoint that works for dashboard
+      fetch(`${API_BASE}/api/stats/recent-detections?limit=50`)
+        .then((res) => res.json())
+        .then((response) => {
+          console.log('🔍 Received data:', response);
+          
+          if (!response.data || !Array.isArray(response.data)) {
+            setError("Invalid response format");
+            setLoading(false);
+            return;
+          }
 
-            const detectionTime = new Date(detection.timestamp);
-            const timeStr = detectionTime.toLocaleTimeString("en-US", {
+          const detections = response.data;
+          
+          // Transform detections into alert format
+          const formattedAlerts = detections.map((det) => ({
+            id: det._id || det.id,
+            animal: det.species.charAt(0).toUpperCase() + det.species.slice(1),
+            message: `${det.alertLevel === "high" ? "🚨" : "⚠️"} ${det.species.charAt(0).toUpperCase() + det.species.slice(1)} detected`,
+            time: new Date(det.time).toLocaleTimeString("en-US", {
               hour: "numeric",
               minute: "2-digit",
               hour12: true,
-            });
+            }),
+            snapshot: det.image,
+            video: det.video || 'Unknown',
+            alertLevel: det.alertLevel || 'medium',
+            species: det.species.toLowerCase(),
+          }));
 
-            return {
-              id: detection.id,
-              animal:
-                primarySpecies.charAt(0).toUpperCase() + primarySpecies.slice(1),
-              message: `${
-                alertLevel === "high" ? "🚨" : "⚠️"
-              } ${primarySpecies.charAt(0).toUpperCase() + primarySpecies.slice(1)
-                } detected (${Math.round(confidence * 100)}% confidence)`,
-              time: timeStr,
-              snapshot: detection.snapshot.path,
-              video: detection.video,
-              alertLevel: alertLevel,
-              species: primarySpecies.toLowerCase(),
-            };
-          });
+          setAlerts(formattedAlerts);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching detections:", err);
+          setError("Failed to connect to server");
+          setLoading(false);
+        });
+    };
 
-          setAlerts(formattedAlerts.reverse()); // newest first
-          setLoading(false);
-        } else {
-          setError("Failed to load detections");
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        console.error("Error fetching detections:", err);
-        setError("Failed to connect to server");
-        setLoading(false);
-      });
-  }, [API_BASE]);
+    // Fetch immediately on mount
+    fetchAlerts();
+
+    // Then fetch every 10 seconds for auto-refresh
+    const interval = setInterval(fetchAlerts, 10000);
+
+    // Cleanup on unmount
+    return () => clearInterval(interval);
+  }, []);
 
   // 🆕 Get unique species list for filter dropdown
   const speciesList = useMemo(() => {

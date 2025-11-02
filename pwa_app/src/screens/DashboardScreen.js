@@ -20,6 +20,7 @@ import "../styles/Dashboard.css";
 import UploadScreen from "./UploadScreen";
 import AlertScreen from "./AlertScreen";
 import Security2FA from "./Security2FA";
+import { API_BASE } from '../config/pushConfig';
 
 export default function DashboardScreen({ title = "Dashboard", onLogout }) {
   const [activeScreen, setActiveScreen] = useState("dashboard");
@@ -40,11 +41,8 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
   //const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   // Auto-detect: use localhost on computer, IP address on phone
-  const hostname = window.location.hostname;
-  const API_URL = 
-    hostname === 'localhost' || hostname === '127.0.0.1'
-      ? "http://localhost:5000"
-      : "http://192.168.0.100:5000";
+  const API_URL = API_BASE;
+
   // Read logged-in user from localStorage
   const auth = useMemo(() => {
     try { return JSON.parse(localStorage.getItem("auth")); } catch { return null; }
