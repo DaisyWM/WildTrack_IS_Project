@@ -35,6 +35,10 @@ export default function RangerDashboard({ onLogout }) {
   const [alertData, setAlertData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // recent detections and image blobs (for thumbnails)
+  const [recentDetections, setRecentDetections] = useState([]);
+  const [imageBlobs, setImageBlobs] = useState({}); // { [detId]: objectUrl | null }
+
   // Auto-detect: use localhost on computer, IP address on phone
   const API_URL = API_BASE;
 
@@ -55,32 +59,42 @@ export default function RangerDashboard({ onLogout }) {
     }
   }, []);
 
-  // Fetch stats
+  // Helper: build absolute image URL safely
+  function buildImageUrl(apiBase, snapshot) {
+    if (!snapshot) return null;
+    // If already absolute, prefer https when possible
+    if (/^https?:\/\//i.test(snapshot)) {
+      if (snapshot.startsWith('http://') && apiBase?.startsWith('https://')) {
+        return snapshot.replace(/^http:\/\//i, 'https://');
+      }
+      return snapshot;
+    }
+    const base = apiBase ? apiBase.replace(/\/$/, '') : '';
+    const path = snapshot.startsWith('/') ? snapshot : `/${snapshot}`;
+    return `${base}${path}`;
+  }
+
+  // Fetch stats + recent detections
   useEffect(() => {
     let mounted = true;
+
     const fetchData = async () => {
       if (!mounted) return;
       setLoading(true);
       try {
-        const [summaryRes, timelineRes, speciesRes, alertRes] = await Promise.all([
-          fetch(`${API_URL}/api/stats/summary?timeframe=${timeframe}&dangerOnly=true`, {
-            headers: getHeaders()
-          }),
-          fetch(`${API_URL}/api/stats/detections-timeline?timeframe=${timeframe}`, {
-            headers: getHeaders()
-          }),
-          fetch(`${API_URL}/api/stats/species-breakdown?dangerOnly=true`, {
-            headers: getHeaders()
-          }),
-          fetch(`${API_URL}/api/stats/alert-outcomes`, {
-            headers: getHeaders()
-          }),
+        const [summaryRes, timelineRes, speciesRes, alertRes, recentRes] = await Promise.all([
+          fetch(`${API_URL}/api/stats/summary?timeframe=${timeframe}&dangerOnly=true`, { headers: getHeaders() }),
+          fetch(`${API_URL}/api/stats/detections-timeline?timeframe=${timeframe}`, { headers: getHeaders() }),
+          fetch(`${API_URL}/api/stats/species-breakdown?dangerOnly=true`, { headers: getHeaders() }),
+          fetch(`${API_URL}/api/stats/alert-outcomes`, { headers: getHeaders() }),
+          fetch(`${API_URL}/api/stats/recent-detections?limit=3`, { headers: getHeaders() }),
         ]);
 
         const summaryData = summaryRes.ok ? await summaryRes.json() : {};
         const timelineDataRes = timelineRes.ok ? await timelineRes.json() : {};
         const speciesDataRes = speciesRes.ok ? await speciesRes.json() : {};
         const alertDataRes = alertRes.ok ? await alertRes.json() : {};
+        const recentDataRes = recentRes.ok ? await recentRes.json() : {};
 
         if (!mounted) return;
 
@@ -88,6 +102,7 @@ export default function RangerDashboard({ onLogout }) {
         setTimelineData(timelineDataRes.data || []);
         setSpeciesData(speciesDataRes.data || []);
         setAlertData(alertDataRes.data || []);
+        setRecentDetections(recentDataRes.data || []);
       } catch (err) {
         console.error("Failed to fetch ranger dashboard data:", err);
       } finally {
@@ -96,8 +111,63 @@ export default function RangerDashboard({ onLogout }) {
     };
 
     fetchData();
-    return () => { mounted = false; };
+    const interval = setInterval(fetchData, 10000); // refresh occasionally
+    return () => { mounted = false; clearInterval(interval); };
   }, [timeframe, API_URL]);
+
+  // Fetch images for recentDetections (convert to blob object URLs so auth works)
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchAllImages() {
+      if (!recentDetections || recentDetections.length === 0) return;
+
+      // iterate detections
+      for (const det of recentDetections) {
+        const id = det._id || det.id;
+        if (!id) continue;
+        // skip if already have value (even null)
+        if (Object.prototype.hasOwnProperty.call(imageBlobs, id)) continue;
+
+        const snapshotPath = det.image || det.snapshot || null;
+        const imgUrl = buildImageUrl(API_URL, snapshotPath);
+        if (!imgUrl) {
+          setImageBlobs(prev => ({ ...prev, [id]: null }));
+          continue;
+        }
+
+        try {
+          const res = await fetch(imgUrl, { headers: getHeaders() });
+          if (!res.ok) {
+            console.warn('Image fetch failed', imgUrl, res.status);
+            setImageBlobs(prev => ({ ...prev, [id]: null }));
+            continue;
+          }
+          const blob = await res.blob();
+          const objectUrl = URL.createObjectURL(blob);
+          if (cancelled) {
+            // cleanup if cancelled
+            URL.revokeObjectURL(objectUrl);
+            break;
+          }
+          setImageBlobs(prev => ({ ...prev, [id]: objectUrl }));
+        } catch (err) {
+          console.error('Error fetching image blob', imgUrl, err);
+          setImageBlobs(prev => ({ ...prev, [id]: null }));
+        }
+      }
+    }
+
+    fetchAllImages();
+
+    // cleanup on unmount: revoke object URLs
+    return () => {
+      cancelled = true;
+      Object.values(imageBlobs).forEach((obj) => {
+        if (obj) URL.revokeObjectURL(obj);
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recentDetections, API_URL]); // note: imageBlobs intentionally not in deps to avoid refetch loop
 
   // Format timeline labels
   const formatLabel = useCallback((label) => {
@@ -110,7 +180,7 @@ export default function RangerDashboard({ onLogout }) {
     }
   }, [timeframe]);
 
-  const formattedTimeline = React.useMemo(() => {
+  const formattedTimeline = useMemo(() => {
     return (timelineData || []).map(item => ({
       ...item,
       label: formatLabel(item.label),
@@ -122,8 +192,8 @@ export default function RangerDashboard({ onLogout }) {
 
   const gotoSettings = () => { setActiveScreen("settings"); setDropdownOpen(false); };
 
-  // --- Render ---
-  // If Settings page selected, render Security2FA
+  // --- Render --- //
+  // Settings
   if (activeScreen === "settings") {
     return (
       <div className="dashboard">
@@ -151,22 +221,10 @@ export default function RangerDashboard({ onLogout }) {
             <h2>Ranger Menu</h2>
             <nav>
               <ul>
-                <li className={activeScreen === "dashboard" ? "active" : ""} 
-                    onClick={() => { setActiveScreen("dashboard"); setSidebarOpen(false); }}>
-                  Dashboard
-                </li>
-                <li className={activeScreen === "alerts" ? "active" : ""} 
-                    onClick={() => { setActiveScreen("alerts"); setSidebarOpen(false); }}>
-                  Alerts
-                </li>
-                <li className={activeScreen === "reports" ? "active" : ""} 
-                    onClick={() => { setActiveScreen("reports"); setSidebarOpen(false); }}>
-                  Reports
-                </li>
-                <li className={activeScreen === "settings" ? "active" : ""} 
-                    onClick={() => { gotoSettings(); setSidebarOpen(false); }}>
-                  Settings
-                </li>
+                <li className={activeScreen === "dashboard" ? "active" : ""} onClick={() => { setActiveScreen("dashboard"); setSidebarOpen(false); }}>Dashboard</li>
+                <li className={activeScreen === "alerts" ? "active" : ""} onClick={() => { setActiveScreen("alerts"); setSidebarOpen(false); }}>Alerts</li>
+                <li className={activeScreen === "reports" ? "active" : ""} onClick={() => { setActiveScreen("reports"); setSidebarOpen(false); }}>Reports</li>
+                <li className={activeScreen === "settings" ? "active" : ""} onClick={() => { gotoSettings(); setSidebarOpen(false); }}>Settings</li>
               </ul>
             </nav>
           </aside>
@@ -179,7 +237,7 @@ export default function RangerDashboard({ onLogout }) {
     );
   }
 
-  // If Alerts page selected, render AlertScreen
+  // Alerts page
   if (activeScreen === "alerts") {
     return (
       <div className="dashboard">
@@ -207,22 +265,10 @@ export default function RangerDashboard({ onLogout }) {
             <h2>Ranger Menu</h2>
             <nav>
               <ul>
-                <li className={activeScreen === "dashboard" ? "active" : ""} 
-                    onClick={() => { setActiveScreen("dashboard"); setSidebarOpen(false); }}>
-                  Dashboard
-                </li>
-                <li className={activeScreen === "alerts" ? "active" : ""} 
-                    onClick={() => { setActiveScreen("alerts"); setSidebarOpen(false); }}>
-                  Alerts
-                </li>
-                <li className={activeScreen === "reports" ? "active" : ""} 
-                    onClick={() => { setActiveScreen("reports"); setSidebarOpen(false); }}>
-                  Reports
-                </li>
-                <li className={activeScreen === "settings" ? "active" : ""} 
-                    onClick={() => { gotoSettings(); setSidebarOpen(false); }}>
-                  Settings
-                </li>
+                <li className={activeScreen === "dashboard" ? "active" : ""} onClick={() => { setActiveScreen("dashboard"); setSidebarOpen(false); }}>Dashboard</li>
+                <li className={activeScreen === "alerts" ? "active" : ""} onClick={() => { setActiveScreen("alerts"); setSidebarOpen(false); }}>Alerts</li>
+                <li className={activeScreen === "reports" ? "active" : ""} onClick={() => { setActiveScreen("reports"); setSidebarOpen(false); }}>Reports</li>
+                <li className={activeScreen === "settings" ? "active" : ""} onClick={() => { gotoSettings(); setSidebarOpen(false); }}>Settings</li>
               </ul>
             </nav>
           </aside>
@@ -235,7 +281,7 @@ export default function RangerDashboard({ onLogout }) {
     );
   }
 
-  // Default dashboard rendering
+  // Default Dashboard rendering
   return (
     <div className="dashboard">
       {/* Top Navbar */}
@@ -263,22 +309,10 @@ export default function RangerDashboard({ onLogout }) {
           <h2>Ranger Menu</h2>
           <nav>
             <ul>
-              <li className={activeScreen === "dashboard" ? "active" : ""} 
-                  onClick={() => { setActiveScreen("dashboard"); setSidebarOpen(false); }}>
-                Dashboard
-              </li>
-              <li className={activeScreen === "alerts" ? "active" : ""} 
-                  onClick={() => { setActiveScreen("alerts"); setSidebarOpen(false); }}>
-                Alerts
-              </li>
-              <li className={activeScreen === "reports" ? "active" : ""} 
-                  onClick={() => { setActiveScreen("reports"); setSidebarOpen(false); }}>
-                Reports
-              </li>
-              <li className={activeScreen === "settings" ? "active" : ""} 
-                  onClick={() => { gotoSettings(); setSidebarOpen(false); }}>
-                Settings
-              </li>
+              <li className={activeScreen === "dashboard" ? "active" : ""} onClick={() => { setActiveScreen("dashboard"); setSidebarOpen(false); }}>Dashboard</li>
+              <li className={activeScreen === "alerts" ? "active" : ""} onClick={() => { setActiveScreen("alerts"); setSidebarOpen(false); }}>Alerts</li>
+              <li className={activeScreen === "reports" ? "active" : ""} onClick={() => { setActiveScreen("reports"); setSidebarOpen(false); }}>Reports</li>
+              <li className={activeScreen === "settings" ? "active" : ""} onClick={() => { gotoSettings(); setSidebarOpen(false); }}>Settings</li>
             </ul>
           </nav>
         </aside>
@@ -355,6 +389,33 @@ export default function RangerDashboard({ onLogout }) {
                     </ResponsiveContainer>
                   ) : <div className="no-data">No alert outcome data</div>}
                 </ChartCard>
+              </div>
+
+              {/* Recent Detections - show thumbnails (fetch with auth) */}
+              <div className="recent-detections">
+                <h3>Recent Detections</h3>
+                {recentDetections.length > 0 ? (
+                  <ul>
+                    {recentDetections.map((det, idx) => {
+                      const id = det._id || det.id || idx;
+                      const objectUrl = imageBlobs[id];
+                      const fallback = "https://via.placeholder.com/40";
+                      return (
+                        <li key={id} className="recent-det-item">
+                          <img
+                            src={objectUrl || fallback}
+                            alt={det.species || "detection"}
+                            onError={(e) => { e.currentTarget.src = fallback; }}
+                            style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }}
+                          />
+                          <span style={{ marginLeft: 8 }}>{det.species} - {det.time ? new Date(det.time).toLocaleTimeString() : ''}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p>No recent detections</p>
+                )}
               </div>
 
               {/* Alerts panel with button to open Alerts page */}
