@@ -13,3 +13,12 @@ const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
 export const API_BASE = isLocalhost
   ? "http://localhost:5000"           // Local development
   : NGROK_URL;                         // Deployed frontend (uses ngrok)
+
+// Helper function to get headers that bypass ngrok warning
+export const getHeaders = (additionalHeaders = {}) => {
+  return {
+    'ngrok-skip-browser-warning': 'true',  // Bypass ngrok warning page
+    'Content-Type': 'application/json',
+    ...additionalHeaders
+  };
+};

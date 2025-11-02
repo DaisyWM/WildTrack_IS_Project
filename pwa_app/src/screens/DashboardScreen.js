@@ -20,7 +20,7 @@ import "../styles/Dashboard.css";
 import UploadScreen from "./UploadScreen";
 import AlertScreen from "./AlertScreen";
 import Security2FA from "./Security2FA";
-import { API_BASE } from '../config/pushConfig';
+import { API_BASE, getHeaders } from '../config/pushConfig';
 
 export default function DashboardScreen({ title = "Dashboard", onLogout }) {
   const [activeScreen, setActiveScreen] = useState("dashboard");
@@ -37,8 +37,6 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
   const [alertData, setAlertData] = useState([]);
   const [recentDetections, setRecentDetections] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  //const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   // Auto-detect: use localhost on computer, IP address on phone
   const API_URL = API_BASE;
@@ -66,11 +64,21 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
       setLoading(true);
       try {
         const [summaryRes, timelineRes, speciesRes, alertRes, recentRes] = await Promise.all([
-          fetch(`${API_URL}/api/stats/summary?timeframe=${timeframe}`),
-          fetch(`${API_URL}/api/stats/detections-timeline?timeframe=${timeframe}`),
-          fetch(`${API_URL}/api/stats/species-breakdown`),
-          fetch(`${API_URL}/api/stats/alert-outcomes`),
-          fetch(`${API_URL}/api/stats/recent-detections?limit=3`),
+          fetch(`${API_URL}/api/stats/summary?timeframe=${timeframe}`, {
+            headers: getHeaders()
+          }),
+          fetch(`${API_URL}/api/stats/detections-timeline?timeframe=${timeframe}`, {
+            headers: getHeaders()
+          }),
+          fetch(`${API_URL}/api/stats/species-breakdown`, {
+            headers: getHeaders()
+          }),
+          fetch(`${API_URL}/api/stats/alert-outcomes`, {
+            headers: getHeaders()
+          }),
+          fetch(`${API_URL}/api/stats/recent-detections?limit=3`, {
+            headers: getHeaders()
+          }),
         ]);
 
         const summaryData = await summaryRes.json();
