@@ -322,7 +322,7 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
                         {recentDetections.map((det, idx) => (
                           <li key={idx}>
                             <img
-                              src={det.image ? `${API_URL}${det.image}` : "https://via.placeholder.com/40"}
+                              src={det.image ? `${API_URL}${det.image}?ngrok-skip-browser-warning=true` : "https://via.placeholder.com/40"}
                               alt={det.species}
                               onError={(e) => e.target.src = "https://via.placeholder.com/40"}
                             />
