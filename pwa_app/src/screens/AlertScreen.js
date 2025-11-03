@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { API_BASE, getHeaders } from '../config/pushConfig';
+import SafeImage from '../components/SafeImage'; // 🆕 Import SafeImage
 import "../styles/Alert.css";
 
 export default function AlertScreen({ goBack }) {
@@ -176,12 +177,17 @@ export default function AlertScreen({ goBack }) {
           {filteredAlerts.map((alert) => (
             <li key={alert.id} className={`alert-item alert-${alert.alertLevel}`}>
               <div className="alert-image">
-                <img
-                  src={`${API_BASE}${alert.snapshot}?ngrok-skip-browser-warning=true`}
+                {/* 🆕 USE SafeImage instead of regular img */}
+                <SafeImage
+                  src={alert.snapshot}
                   alt={`${alert.animal} detection`}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
                   onError={(e) => {
-                    e.target.src =
-                      "https://via.placeholder.com/400x300?text=Image+Not+Found";
+                    console.error('Image load error:', alert.snapshot);
                   }}
                 />
               </div>
