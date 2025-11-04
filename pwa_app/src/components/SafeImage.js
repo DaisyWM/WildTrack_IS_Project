@@ -1,6 +1,4 @@
-// src/components/SafeImage.js
-// Component that loads images with proper ngrok headers
-
+// SafeImage.js
 import React, { useState, useEffect } from 'react';
 import { API_BASE } from '../config/pushConfig';
 
@@ -10,48 +8,41 @@ export default function SafeImage({ src, alt, onError, ...props }) {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    // If src is a full URL, use it directly
-    if (src?.startsWith('http')) {
-      setImageSrc(src);
+    // Reset states when src changes
+    setLoading(true);
+    setError(false);
+
+    if (!src) {
       setLoading(false);
+      setImageSrc(null);
       return;
     }
 
-    // Otherwise, fetch the image with proper headers
+    // If src is already a full URL, use it directly
+    const url = src.startsWith('http') ? src : `${API_BASE}${src.startsWith('/') ? '' : '/'}${src}`;
+
     const fetchImage = async () => {
       try {
-        setLoading(true);
-        setError(false);
-
-        const imageUrl = src?.startsWith('/') ? `${API_BASE}${src}` : `${API_BASE}/${src}`;
-        
-        const response = await fetch(imageUrl, {
+        const response = await fetch(url, {
           headers: {
             'ngrok-skip-browser-warning': 'true',
           },
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const blob = await response.blob();
         const objectUrl = URL.createObjectURL(blob);
         setImageSrc(objectUrl);
         setLoading(false);
       } catch (err) {
-        console.error('Error loading image:', err);
+        console.error('SafeImage load error:', err);
         setError(true);
         setLoading(false);
         if (onError) onError(err);
       }
     };
 
-    if (src) {
-      fetchImage();
-    }
+    fetchImage();
 
-    // Cleanup blob URL on unmount
     return () => {
       if (imageSrc && imageSrc.startsWith('blob:')) {
         URL.revokeObjectURL(imageSrc);
