@@ -9,9 +9,6 @@ const UploadScreen = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  // Use centralized API_BASE from config
-  const API_URL = API_BASE;
-
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -37,10 +34,8 @@ const UploadScreen = () => {
     formData.append("video", file);
 
     try {
-      // Create XMLHttpRequest to track upload progress
       const xhr = new XMLHttpRequest();
 
-      // Track upload progress
       xhr.upload.addEventListener("progress", (e) => {
         if (e.lengthComputable) {
           const percentComplete = Math.round((e.loaded / e.total) * 100);
@@ -48,7 +43,6 @@ const UploadScreen = () => {
         }
       });
 
-      // Handle response
       xhr.addEventListener("load", () => {
         setUploading(false);
         if (xhr.status === 200) {
@@ -61,19 +55,16 @@ const UploadScreen = () => {
         }
       });
 
-      // Handle errors
       xhr.addEventListener("error", () => {
         setUploading(false);
         setError("Network error. Please check your connection.");
       });
 
-      // Send request with ngrok bypass header
-      xhr.open("POST", `${API_URL}/api/uploads`);
+      xhr.open("POST", `${API_BASE}/api/uploads`);
       
-      // Add headers from getHeaders() to bypass ngrok warning
       const headers = getHeaders();
       Object.keys(headers).forEach(key => {
-        if (key !== 'Content-Type') { // Don't set Content-Type for FormData
+        if (key !== 'Content-Type') {
           xhr.setRequestHeader(key, headers[key]);
         }
       });
@@ -87,7 +78,6 @@ const UploadScreen = () => {
     }
   };
 
-  // Drag and drop handlers
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -157,7 +147,6 @@ const UploadScreen = () => {
               setResult(null);
               setError(null);
               setProgress(0);
-              // Reset the file input
               const fileInput = document.getElementById("fileInput");
               if (fileInput) fileInput.value = "";
             }}
@@ -168,7 +157,6 @@ const UploadScreen = () => {
         </div>
       )}
 
-      {/* Upload Progress */}
       {uploading && (
         <div className="progress-container">
           <div className="progress-bar">
@@ -191,14 +179,12 @@ const UploadScreen = () => {
         {uploading ? "⏳ Processing..." : "🚀 Upload Video"}
       </button>
 
-      {/* Error Display */}
       {error && (
         <div className="error-message">
           <p>❌ Error: {error}</p>
         </div>
       )}
 
-      {/* Results section */}
       <div className="results">
         <h3>Detection Results</h3>
         
@@ -208,12 +194,10 @@ const UploadScreen = () => {
 
         {result && result.success && (
           <div className="results-content">
-            {/* Success Message */}
             <div className="success-message">
               ✅ Video processed successfully! Found {result.detections.total} detection(s)
             </div>
 
-            {/* Video Info */}
             <div className="info-card">
               <h4>📹 Video Information</h4>
               <div className="info-grid">
@@ -234,7 +218,6 @@ const UploadScreen = () => {
               </div>
             </div>
 
-            {/* Species Summary */}
             {result.detections.species_summary && 
              Object.keys(result.detections.species_summary).length > 0 && (
               <div className="info-card">
@@ -249,7 +232,6 @@ const UploadScreen = () => {
               </div>
             )}
 
-            {/* High Priority Alerts */}
             {result.alerts && result.alerts.length > 0 && (
               <div className="alert-card">
                 <h4>⚠️ High Priority Alerts</h4>
@@ -264,7 +246,6 @@ const UploadScreen = () => {
               </div>
             )}
 
-            {/* Snapshots Gallery */}
             {result.detections.snapshots && result.detections.snapshots.length > 0 && (
               <div className="snapshots-section">
                 <h4>📸 Detection Snapshots ({result.detections.snapshots.length})</h4>
@@ -272,7 +253,7 @@ const UploadScreen = () => {
                   {result.detections.snapshots.map((snapshot, idx) => (
                     <div key={idx} className="snapshot-card">
                       <img
-                        src={`${API_URL}${snapshot.path}`}
+                        src={`${API_BASE}${snapshot.path}`}
                         alt={`Detection ${idx + 1}`}
                         className="snapshot-image"
                         onError={(e) => {
