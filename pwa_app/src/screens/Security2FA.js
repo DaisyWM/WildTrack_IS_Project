@@ -24,8 +24,8 @@ export default function Security2FA() {
   const [pushSubscribed, setPushSubscribed] = useState(false);
   const [checkingSub, setCheckingSub] = useState(true); // show small spinner if needed
 
-  const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
+  //const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API = process.env.REACT_APP_API_URL || "https://nontheosophic-lieselotte-morphogenetic.ngrok-free.dev";
   // Read auth token from localStorage
   const auth = (() => {
     try { return JSON.parse(localStorage.getItem("auth")) || null; } catch { return null; }
