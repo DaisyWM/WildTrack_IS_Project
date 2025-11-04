@@ -42,8 +42,8 @@ export default function PushSubscribeButton() {
       });
       console.log("Push subscription:", subscription);
 
-      // Send subscription to backend - FIXED ENDPOINT
-      const res = await fetch(`${API_BASE}/api/push/subscribe`, {
+      // Send subscription to backend - UPDATED ENDPOINT
+      const res = await fetch(`${API_BASE}/api/notifications/subscribe`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(subscription),
@@ -54,7 +54,6 @@ export default function PushSubscribeButton() {
       if (json.success) {
         setStatus("subscribed");
         alert("Subscribed to push notifications ✅");
-        // Dispatch event so other components know subscription changed
         window.dispatchEvent(new Event("push-subscription-updated"));
       } else {
         setStatus("error");
@@ -64,6 +63,31 @@ export default function PushSubscribeButton() {
       console.error("Subscribe error:", err);
       setStatus("error");
       alert("Subscription failed — see console for details");
+    }
+  }
+
+  async function unsubscribe() {
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (!sub) return;
+
+      await sub.unsubscribe();
+      console.log("✅ Unsubscribed old push subscription");
+
+      // Remove subscription from backend - UPDATED ENDPOINT
+      await fetch(`${API_BASE}/api/notifications/unsubscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sub),
+      });
+
+      setStatus("idle");
+      alert("Unsubscribed from push notifications");
+      window.dispatchEvent(new Event("push-subscription-updated"));
+    } catch (err) {
+      console.error("Unsubscribe error:", err);
+      alert("Failed to unsubscribe — see console for details");
     }
   }
 
