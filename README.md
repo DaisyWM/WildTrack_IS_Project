@@ -140,18 +140,71 @@ npm start
 ## 📁 Project Structure
 ```
 WildTrack_IS_Project/
-├── backend/
-│   ├── detect_animals.py
-│   ├── models/
-│   ├── routes/
-│   ├── server.js
-│   └── ...
-├── pwa_app/
+├── backend/                           # Node.js + Python backend
+│   ├── detect_animals.py              # YOLOv8 inference pipeline
+│   ├── server.js                      # Express server entry point
+│   ├── models/                        # Mongoose models
+│   │   ├── Detection.js               # Detection log schema
+│   │   └── User.js                    # User (Farmer / Ranger) schema
+│   ├── routes/                        # Backend API routes
+│   │   ├── auth.js                    # (Optional) authentication endpoints
+│   │   ├── uploads.js                 # Video upload handling via Multer
+│   │   ├── detections.js              # Fetch detection logs
+│   │   ├── push.js                    # Push notification endpoints
+│   │   ├── stats.js                   # Analytics / statistics routes
+│   │   └── predict/                   # (Optional) route for testing model inference
+│   ├── snapshots/                     # Auto-generated snapshots with bounding boxes (git-ignored)
+│   ├── uploads/                       # Uploaded videos (git-ignored)
+│   ├── push_subscriptions.json        # Web Push subscriptions (git-ignored)
+│   ├── detection_history.json         # Backup of detections (git-ignored)
+│   ├── package.json                   # Backend dependencies
+│   └── package-lock.json
+│
+├── pwa_app/                           # Progressive Web App (React)
 │   ├── public/
-│   ├── src/
-│   └── ...
-└── model_training/
-    └── models/training_v2_wildtrack.pt
+│   │   ├── index.html                 # Base HTML template
+│   │   ├── manifest.json              # PWA manifest file
+│   │   ├── service-worker.js          # Service Worker for offline support & push
+│   │   ├── logo192.png
+│   │   ├── logo512.png
+│   │   └── favicon.ico
+│   ├── src/                           # Frontend application code
+│   │   ├── App.js                     # Main application router
+│   │   ├── index.js                   # React entry point
+│   │   ├── components/
+│   │   │   ├── NotificationPermission.js
+│   │   │   └── PushSubscribeButton.js
+│   │   ├── screens/                   # Main application screens
+│   │   │   ├── AuthScreen.js
+│   │   │   ├── RoleSelection.js
+│   │   │   ├── DashboardScreen.js
+│   │   │   ├── RangerDashboard.js
+│   │   │   ├── AlertScreen.js
+│   │   │   └── UploadScreen.js
+│   │   ├── styles/                    # CSS files for styling
+│   │   │   ├── App.css
+│   │   │   ├── Alert.css
+│   │   │   ├── Dashboard.css
+│   │   │   └── Upload.css
+│   │   └── utils/
+│   │       ├── notifications.js       # Push notification helpers
+│   │       └── pushSubscription.js    # WebPush subscription management
+│   ├── package.json                   # Frontend dependencies
+│   └── package-lock.json
+│
+├── model_training/                    # Model training environment
+│   ├── training_results/              # PR curves, F1 curves, confusion matrix (optional)
+│   ├── models/
+│   │   └── training_v2_wildtrack.pt   # Final YOLOv8 model weights
+│   ├── yolo_dataset_v2/               # YOLO-formatted dataset (git-ignored)
+│   └── model_training_notebooks/      # Jupyter/Lightning AI notebooks for training
+│
+├── .github/                           # GitHub metadata (classroom, workflows)
+│
+├── README.md                          # Main project documentation
+├── .gitignore                         # Ignore rules
+└── package.json (root)                # Meta (if present)
+
 ```
 
 ## 🧪 Testing Summary
