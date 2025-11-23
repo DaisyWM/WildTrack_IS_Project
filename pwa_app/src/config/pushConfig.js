@@ -3,7 +3,8 @@ export const VAPID_PUBLIC_KEY =
   "BK-O_nsz9JXgvn6Lqxxrs8Gpks5fwE2yuxMc1lTB2DCxes7oGb2jFcubGZ39yTKxwOZ7Mg_ijWlUhSuqYOevWnA";
 
 // Your NEW ngrok URL
-const NGROK_URL = "https://nontheosophic-lieselotte-morphogenetic.ngrok-free.dev";
+//const NGROK_URL = "https://nontheosophic-lieselotte-morphogenetic.ngrok-free.dev";
+const NGROK_URL = "https://shelby-unbowing-nonconjugally.ngrok-free.dev";
 
 // Detect if running on localhost or deployed
 const hostname = window.location.hostname;
