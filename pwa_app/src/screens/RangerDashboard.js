@@ -19,6 +19,7 @@ import "../styles/Dashboard.css";
 import Security2FA from "./Security2FA";
 import AlertScreen from "./AlertScreen";
 import { API_BASE, getHeaders } from '../config/pushConfig';
+import ReportsScreen from "./ReportsScreen";
 
 export default function RangerDashboard({ onLogout }) {
   const [activeScreen, setActiveScreen] = useState("dashboard");
@@ -280,6 +281,54 @@ export default function RangerDashboard({ onLogout }) {
       </div>
     );
   }
+
+  // Reports page
+if (activeScreen === "reports") {
+  return (
+    <div className="dashboard">
+      <div className="top-navbar">
+        <button className="hamburger-btn" aria-label="Open menu" onClick={() => setSidebarOpen(true)}>☰</button>
+        <div className="logo">WildTrack</div>
+        <div className="right-side">
+          <div className="welcome-message">Ranger / KWS Ops</div>
+          <div className="profile-name" onClick={() => setDropdownOpen(!dropdownOpen)}>
+            {name} ({role}) ⌄
+          </div>
+
+          {dropdownOpen && (
+            <ul className="dropdown-menu">
+              <li>Profile</li>
+              <li onClick={gotoSettings}>Settings</li>
+              <li className="logout" onClick={onLogout}>Logout</li>
+            </ul>
+          )}
+        </div>
+      </div>
+
+      {sidebarOpen && <div className="overlay" onClick={() => setSidebarOpen(false)} />}
+
+      <div className="main-area">
+        <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+          <button className="close-sidebar" onClick={() => setSidebarOpen(false)}>✕</button>
+          <h2>Ranger Menu</h2>
+          <nav>
+            <ul>
+              <li className={activeScreen === "dashboard" ? "active" : ""} onClick={() => { setActiveScreen("dashboard"); setSidebarOpen(false); }}>Dashboard</li>
+              <li className={activeScreen === "alerts" ? "active" : ""} onClick={() => { setActiveScreen("alerts"); setSidebarOpen(false); }}>Alerts</li>
+              <li className={activeScreen === "reports" ? "active" : ""} onClick={() => { setActiveScreen("reports"); setSidebarOpen(false); }}>Reports</li>
+              <li className={activeScreen === "settings" ? "active" : ""} onClick={() => { gotoSettings(); setSidebarOpen(false); }}>Settings</li>
+            </ul>
+          </nav>
+        </aside>
+
+        <main className="main-content">
+          <ReportsScreen goBack={() => setActiveScreen("dashboard")} />
+        </main>
+      </div>
+    </div>
+  );
+}
+
 
   // Default Dashboard rendering
   return (
