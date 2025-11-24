@@ -63,11 +63,12 @@ router.post("/", upload.single("video"), async (req, res) => {
 
   python.stdout.on("data", (data) => {
     dataString += data.toString();
+    console.log(`[PYTHON STDOUT] ${data.toString()}`);
   });
 
   python.stderr.on("data", (data) => {
     const msg = data.toString();
-    console.log(`[PYTHON] ${msg}`);
+      console.log(`[PYTHON STDERR] ${msg}`);
     errorString += msg;
   });
 
@@ -103,8 +104,23 @@ router.post("/", upload.single("video"), async (req, res) => {
     }
 
     try {
-      // Parse JSON output from Python
-      const result = JSON.parse(dataString);
+      // Clean the data string - remove any non-JSON lines at the beginning
+      const lines = dataString.trim().split('\n');
+      let jsonStart = -1;
+      
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].trim().startsWith('{')) {
+          jsonStart = i;
+          break;
+        }
+      }
+      
+      if (jsonStart === -1) {
+        throw new Error('No JSON output found');
+      }
+      
+      const jsonString = lines.slice(jsonStart).join('\n');
+      const result = JSON.parse(jsonString);
 
       if (!result.success) {
         return res.status(500).json({
@@ -116,10 +132,9 @@ router.post("/", upload.single("video"), async (req, res) => {
 
       // Generate alerts for high-priority detections
       const alerts = result.snapshots
-        .filter(s => s.alert_level === "high")
         .map(s => ({
           type: "wildlife_detected",
-          priority: "high",
+          priority: s.alertLevel,
           species: s.detections.map(d => d.species).join(", "),
           timestamp: s.timestamp,
           image: s.path,
@@ -354,6 +369,73 @@ router.delete("/detections/:id", async (req, res) => {
       success: false,
       error: error.message,
     });
+  }
+});
+
+/**
+ * GET /api/uploads/debug-db
+ * Debug database contents
+ */
+router.get("/debug-db", async (req, res) => {
+  try {
+    const totalDetections = await Detection.countDocuments();
+    const completedDetections = await Detection.countDocuments({ status: "completed" });
+    
+    // Get a sample detection to see the structure
+    const sampleDetection = await Detection.findOne({ status: "completed" });
+    
+    // Get all detection statuses
+    const statuses = await Detection.distinct("status");
+    
+    res.json({
+      success: true,
+      stats: {
+        total: totalDetections,
+        completed: completedDetections,
+        statuses: statuses
+      },
+      sampleDetection: sampleDetection ? {
+        id: sampleDetection._id,
+        status: sampleDetection.status,
+        hasAlerts: !!sampleDetection.alerts,
+        alertsCount: sampleDetection.alerts?.length || 0,
+        alertsStructure: sampleDetection.alerts,
+        hasSnapshots: !!sampleDetection.snapshots,
+        snapshotsCount: sampleDetection.snapshots?.length || 0,
+        createdAt: sampleDetection.createdAt
+      } : null,
+      allFields: sampleDetection ? Object.keys(sampleDetection.toObject()) : []
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/uploads/inspect-alerts
+ * Inspect alerts structure specifically
+ */
+router.get("/inspect-alerts", async (req, res) => {
+  try {
+    const detections = await Detection.find({ status: "completed" }).limit(5);
+    
+    const inspection = detections.map(det => ({
+      id: det._id,
+      hasAlerts: !!det.alerts,
+      alertsType: Array.isArray(det.alerts) ? 'array' : typeof det.alerts,
+      alertsLength: det.alerts?.length || 0,
+      alertsContent: det.alerts,
+      hasSnapshots: !!det.snapshots,
+      snapshotsWithAlertLevel: det.snapshots?.filter(s => s.alertLevel).length || 0,
+      createdAt: det.createdAt
+    }));
+    
+    res.json({
+      success: true,
+      inspection
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

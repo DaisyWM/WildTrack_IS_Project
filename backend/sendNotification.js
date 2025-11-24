@@ -1,13 +1,10 @@
 // backend/sendNotification.js
 // Helper script to send push notifications (called by Python)
-
-const fetch = require('node-fetch');
-
 // Read command line arguments
 const args = process.argv.slice(2);
 
 if (args.length < 2) {
-  console.error('Usage: node sendNotification.js <species> <snapshot_path> [alert_level]');
+  console.error('Usage: node sendNotification.js <species> <snapshot_path> [alertLevel]');
   process.exit(1);
 }
 
@@ -33,7 +30,7 @@ const payload = {
   data: {
     species: species,
     snapshot: snapshotPath,
-    alert_level: alertLevel,
+    alertLevel: alertLevel,
     tag: `detection-${species}-${Date.now()}`,
     requireInteraction: isHighPriority, // High alerts stay until dismissed
     image: `http://localhost:5000${snapshotPath}` // Full image URL
