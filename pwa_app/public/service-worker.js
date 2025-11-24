@@ -22,7 +22,7 @@ self.addEventListener('push', function(event) {
     const data = event.data.json();
     
     // Determine vibration pattern based on alert level
-    const isHighAlert = data.data?.alert_level === 'high';
+    const isHighAlert = data.data?.alertLevel === 'high';
     const vibrationPattern = isHighAlert 
       ? [200, 100, 200, 100, 200] // Shorter vibration
       : [200, 100, 200];

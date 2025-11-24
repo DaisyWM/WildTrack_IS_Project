@@ -21,7 +21,7 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 video_path = sys.argv[1]
-model_path = os.path.join("..", "model_training", "models", "my_trained_wildlife_model.pt")
+model_path = os.path.join("..", "model_training", "models", "training_v2_wildtrack.pt")
 output_folder = "snapshots"
 
 # Detection
@@ -41,13 +41,13 @@ os.makedirs(output_folder, exist_ok=True)
 
 
 # 🆕 PUSH NOTIFICATION FUNCTION
-def send_push_notification(species, snapshot_path, alert_level):
+def send_push_notification(species, snapshot_path, alertLevel):
     """
     Trigger push notification via Node.js helper script
     """
     try:
         result = subprocess.run(
-            ['node', 'sendNotification.js', species, snapshot_path, alert_level],
+            ['node', 'sendNotification.js', species, snapshot_path, alertLevel],
             capture_output=True,
             text=True,
             timeout=5
@@ -178,7 +178,7 @@ try:
                         "frame": frame_number,
                         "timestamp": time_in_video,
                         "detections": species_detections,
-                        "alert_level": "high" if species in ["lion", "elephant", "buffalo"] else "medium"
+                        "alertLevel": "high" if species in ["lion", "elephant", "baboon"] else "medium" if species == "zebra" else "low"
                     }
 
                     saved_snapshots.append(snapshot_info)
@@ -187,7 +187,7 @@ try:
                     send_push_notification(
                         species=species,
                         snapshot_path=snapshot_info["path"],
-                        alert_level=snapshot_info["alert_level"]
+                        alertLevel=snapshot_info["alertLevel"]
                     )
 
                     print(
