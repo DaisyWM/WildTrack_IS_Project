@@ -1,24 +1,18 @@
-// backend/models/Detection.js
 const mongoose = require("mongoose");
 
 const detectionSchema = new mongoose.Schema(
   {
-    // User who uploaded
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: false, // Optional if you want to allow anonymous uploads
-    },
-    username: {
-      type: String,
       required: false,
     },
+    username: { type: String, required: false },
 
-    // Video information
     video: {
       filename: { type: String, required: true },
       originalName: String,
-      path: String,
+      path: String, // Local path for the video file
       size: Number,
       duration: Number,
       fps: Number,
@@ -26,16 +20,14 @@ const detectionSchema = new mongoose.Schema(
       processedFrames: Number,
     },
 
-    // Processing results
     detections: {
       total: { type: Number, default: 0 },
       speciesSummary: {
         type: Map,
-        of: Number, // e.g., { "lion": 3, "zebra": 2 }
+        of: Number,
       },
     },
 
-    // Alerts
     alerts: [
       {
         type: { type: String, default: "wildlife_detected" },
@@ -43,15 +35,15 @@ const detectionSchema = new mongoose.Schema(
         species: String,
         timestamp: Number,
         frame: Number,
-        image: String,
+        image: String, // NOTE: This will now store the Cloudinary HTTPS URL
       },
     ],
 
-    // Snapshots
     snapshots: [
       {
         file: String,
-        path: String,
+        path: String, // NOTE: This will now store the Cloudinary HTTPS URL
+        cloudinaryId: String, // NEW: Stores the ID for easier management/deletion
         frame: Number,
         timestamp: Number,
         alertLevel: { type: String, enum: ["low", "medium", "high"] },
@@ -59,35 +51,26 @@ const detectionSchema = new mongoose.Schema(
           {
             species: String,
             confidence: Number,
-            bbox: {
-              x1: Number,
-              y1: Number,
-              x2: Number,
-              y2: Number,
-            },
+            bbox: { x1: Number, y1: Number, x2: Number, y2: Number },
           },
         ],
       },
     ],
 
-    // Status
     status: {
       type: String,
       enum: ["processing", "completed", "failed"],
       default: "processing",
     },
 
-    // Error info (if failed)
     error: String,
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 
-// Indexes for faster queries
 detectionSchema.index({ userId: 1, createdAt: -1 });
-detectionSchema.index({ "detections.speciesSummary": 1 });
 detectionSchema.index({ status: 1 });
 
 module.exports = mongoose.model("Detection", detectionSchema);

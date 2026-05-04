@@ -3,7 +3,7 @@
 Wildlife Detection System
 Processes video, detects animals, saves snapshots with bounding boxes
 (Phone-friendly snapshots: resized + compressed)
-🆕 Sends push notifications when animals are detected
+ Sends push notifications when animals are detected
 """
 
 import os
@@ -145,7 +145,9 @@ try:
 
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                     snapshot_name = f"{species}_{timestamp}_frame{frame_number}.jpg"
-                    snapshot_path = os.path.join(output_folder, snapshot_name)
+                    
+                    # CHANGE: Use absolute path so Node.js can always find the file for Cloudinary
+                    snapshot_path = os.path.abspath(os.path.join(output_folder, snapshot_name))
 
                     # Annotate frame with bounding boxes at original resolution
                     annotated_frame = results[0].plot()
@@ -174,7 +176,7 @@ try:
 
                     snapshot_info = {
                         "file": snapshot_name,
-                        "path": f"/snapshots/{snapshot_name}",
+                        "path": snapshot_path, # UPDATED: Sending full path to Node.js
                         "frame": frame_number,
                         "timestamp": time_in_video,
                         "detections": species_detections,
@@ -209,7 +211,7 @@ try:
             "fps": fps,
             "duration": (total_frames / fps) if fps > 0 else 0.0
         },
-        "snapshots_folder": output_folder,
+        "snapshots_folder": os.path.abspath(output_folder),
         "total_detections": len(saved_snapshots),
         "snapshots": saved_snapshots,
         "species_summary": {

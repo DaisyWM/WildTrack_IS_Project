@@ -1,4 +1,3 @@
-// SafeImage.js
 import React, { useState, useEffect } from 'react';
 import { API_BASE } from '../config/pushConfig';
 
@@ -8,7 +7,7 @@ export default function SafeImage({ src, alt, onError, ...props }) {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    // Reset states when src changes
+    // Reset states whenever the source changes
     setLoading(true);
     setError(false);
 
@@ -18,19 +17,29 @@ export default function SafeImage({ src, alt, onError, ...props }) {
       return;
     }
 
-    // If src is already a full URL, use it directly
-    const url = src.startsWith('http') ? src : `${API_BASE}${src.startsWith('/') ? '' : '/'}${src}`;
+    /**
+     * Logic for Cloud-Ready Architecture:
+     * 1. If src starts with 'http', it is a Cloudinary URL—use it directly.
+     * 2. Otherwise, treat it as a local/relative path and append the API_BASE.
+     */
+    const url = src.startsWith('http') 
+      ? src 
+      : `${API_BASE}${src.startsWith('/') ? '' : '/'}${src}`;
 
     const fetchImage = async () => {
       try {
         const response = await fetch(url, {
           headers: {
+            // This header prevents the ngrok warning page from breaking the image load
             'ngrok-skip-browser-warning': 'true',
           },
         });
+        
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
         const blob = await response.blob();
         const objectUrl = URL.createObjectURL(blob);
+        
         setImageSrc(objectUrl);
         setLoading(false);
       } catch (err) {
@@ -43,6 +52,7 @@ export default function SafeImage({ src, alt, onError, ...props }) {
 
     fetchImage();
 
+    // Cleanup: Revoke the object URL to prevent memory leaks
     return () => {
       if (imageSrc && imageSrc.startsWith('blob:')) {
         URL.revokeObjectURL(imageSrc);
@@ -50,6 +60,7 @@ export default function SafeImage({ src, alt, onError, ...props }) {
     };
   }, [src]);
 
+  // Loading state with simple inline styling
   if (loading) {
     return (
       <div {...props} style={{
@@ -65,6 +76,7 @@ export default function SafeImage({ src, alt, onError, ...props }) {
     );
   }
 
+  // Error state for broken links or failed Cloudinary fetches
   if (error || !imageSrc) {
     return (
       <div {...props} style={{
