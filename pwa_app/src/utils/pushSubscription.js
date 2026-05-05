@@ -63,7 +63,7 @@ export async function subscribeToPushNotifications() {
 // Send subscription to backend
 async function sendSubscriptionToBackend(subscription) {
   try {
-    const response = await fetch('http://localhost:5000/api/push/subscribe', {
+    const response = await fetch('http://localhost:5001/api/push/subscribe', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -6,7 +6,7 @@ export default function RoleSelection({ onRoleSelected }) {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API = process.env.REACT_APP_API_URL || "http://localhost:5001";
 
   const handleSubmit = async (e) => {
     e.preventDefault();

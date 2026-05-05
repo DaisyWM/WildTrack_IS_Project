@@ -11,7 +11,7 @@ const hostname = window.location.hostname;
 const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
 
 export const API_BASE = isLocalhost
-  ? "http://localhost:5000"           // Local development
+  ? "http://localhost:5001"           // Local development
   : NGROK_URL;                         // Deployed on Vercel
 
 console.log(`🔗 API Base URL: ${API_BASE}`);

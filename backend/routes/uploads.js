@@ -34,15 +34,22 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB limit
+  limits: { fileSize: 300 * 1024 * 1024 }, // 300MB limit
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /mp4|avi|mov|mkv|webm/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+    // 1. Define allowed patterns
+    const allowedExtensions = /mp4|avi|mov|mkv|webm/;
+    // 2. Added 'octet-stream' to handle cases where the browser doesn't identify the video correctly
+    const allowedMimeTypes = /video\/(mp4|x-msvideo|quicktime|x-matroska|webm)|application\/octet-stream/;
+
+    // 3. Test both
+    const extname = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedMimeTypes.test(file.mimetype);
     
-    if (mimetype && extname) {
+    // 4. CHANGE: Use || (OR) so if either matches, the file is accepted
+    if (mimetype || extname) {
       return cb(null, true);
     }
+    
     cb(new Error("Only video files (mp4, avi, mov, mkv, webm) are allowed"));
   },
 });
@@ -64,7 +71,7 @@ router.post("/", upload.single("video"), async (req, res) => {
 
   console.log(`[UPLOAD] Processing video: ${req.file.filename}`);
 
-  const python = spawn("python", [pythonScript, videoPath]);
+  const python = spawn("python3", [pythonScript, videoPath]);
 
   let dataString = "";
   let errorString = "";

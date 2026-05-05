@@ -17,55 +17,69 @@ export default function AlertScreen({ goBack }) {
     "baboon": "Baboon",
     "zebra": "Zebra",
     "warthog": "Warthog",
-    "background": "Background",
-    "elephant, elephant": "Elephant",
-    "lion, lion": "Lion",
-    "zebra, zebra": "Zebra", 
-    "zebra, zebra, zebra": "Zebra",
-    "warthog, warthog": "Warthog",
-    "baboon, baboon": "Baboon",
+    "background": "Background"
   };
 
   const normalizeSpecies = (species) => {
+    if (!species) return "Unknown";
     const normalized = species.toLowerCase().trim();
-    if (speciesMapping[normalized]) return speciesMapping[normalized];
     
-    const standardSpecies = ["elephant", "lion", "baboon", "zebra", "warthog", "background"];
-    for (const standard of standardSpecies) {
-      if (normalized.includes(standard)) return speciesMapping[standard];
+    // Check for direct mapping or compound names (e.g., "elephant, elephant")
+    for (const key in speciesMapping) {
+      if (normalized.includes(key)) return speciesMapping[key];
     }
     return species.charAt(0).toUpperCase() + species.slice(1);
   };
 
   useEffect(() => {
     const fetchAlerts = () => {
-      fetch(`${API_BASE}/api/newstats/recent-detections?limit=50`, {
+      // CHANGED: Use /api/uploads/detections as it matches your working Dashboard
+      fetch(`${API_BASE}/api/uploads/detections?limit=50`, {
         headers: getHeaders()
       })
         .then((res) => res.json())
         .then((response) => {
-          if (!response.data || !Array.isArray(response.data)) {
+          // Changed to match the "detections" array structure from your backend
+          const rawData = response.detections || response.data || [];
+          
+          if (!Array.isArray(rawData)) {
             setError("Invalid response format");
             setLoading(false);
             return;
           }
 
-          const formattedAlerts = response.data.map((det) => {
-            const normalizedSpecies = normalizeSpecies(det.species);
-            return {
-              id: det.id,
-              animal: normalizedSpecies,
-              message: `${det.alertLevel === "high" ? "🚨" : det.alertLevel === "medium" ? "⚠️" : "ℹ️"} ${normalizedSpecies} detected`,
-              time: new Date(det.time).toLocaleTimeString("en-US", {
-                hour: "numeric", minute: "2-digit", hour12: true,
-              }),
-              snapshot: det.image, // Passed to SafeImage
-              video: det.video || 'Unknown',
-              alertLevel: det.alertLevel || 'medium',
-              species: normalizedSpecies.toLowerCase(),
-            };
-          });
+          // Replace the previous 'time' logic with this more robust version:
+          const formattedAlerts = [];
 
+          rawData.forEach((det) => {
+            if (det.alerts && Array.isArray(det.alerts)) {
+              det.alerts.forEach((alert, index) => {
+                const normalizedSpecies = normalizeSpecies(alert.species);
+                
+                // Use the detection's creation date as the fallback
+                const alertDate = alert.timestamp ? new Date(alert.timestamp) : new Date(det.createdAt);
+
+                formattedAlerts.push({
+                  id: `${det._id}-${index}`,
+                  animal: normalizedSpecies,
+                  message: `${alert.priority === "high" ? "🚨" : "ℹ️"} ${normalizedSpecies} detected`,
+                  
+                  // This will now show the actual time of the upload
+                  time: alertDate.toLocaleTimeString("en-US", {
+                    hour: "numeric", 
+                    minute: "2-digit", 
+                    hour12: true,
+                  }),
+                  
+                  snapshot: alert.image, 
+                  video: det.video?.originalName || 'Processed Video',
+                  alertLevel: alert.priority || 'medium',
+                  species: normalizedSpecies.toLowerCase(),
+                });
+              });
+            }
+          });
+          
           setAlerts(formattedAlerts);
           setLoading(false);
         })
@@ -76,23 +90,14 @@ export default function AlertScreen({ goBack }) {
     };
 
     fetchAlerts();
-    const interval = setInterval(fetchAlerts, 10000);
+    const interval = setInterval(fetchAlerts, 15000); // 15s interval for better performance
     return () => clearInterval(interval);
   }, []);
 
   const speciesList = useMemo(() => {
-    const preferredOrder = ["background", "elephant", "lion", "baboon", "zebra", "warthog"];
+    const preferredOrder = ["elephant", "lion", "baboon", "zebra", "warthog"];
     const uniqueFromAlerts = [...new Set(alerts.map(a => a.species))];
-    const orderedSpecies = [];
-    
-    preferredOrder.forEach(species => {
-      if (uniqueFromAlerts.includes(species)) orderedSpecies.push(species);
-    });
-    uniqueFromAlerts.forEach(species => {
-      if (!preferredOrder.includes(species) && !orderedSpecies.push(species));
-    });
-    
-    return orderedSpecies;
+    return preferredOrder.filter(s => uniqueFromAlerts.includes(s));
   }, [alerts]);
 
   const filteredAlerts = useMemo(() => {
@@ -134,13 +139,14 @@ export default function AlertScreen({ goBack }) {
       </div>
 
       {filteredAlerts.length === 0 ? (
-        <p>No alerts available matching filters.</p>
+        <div className="no-alerts-container">
+          <p>No alerts available. Try uploading a video to trigger detections.</p>
+        </div>
       ) : (
         <ul className="alerts-list">
           {filteredAlerts.map((alert) => (
             <li key={alert.id} className={`alert-item alert-${alert.alertLevel}`}>
               <div className="alert-image">
-                {/* 🆕 Cloud-ready image loading */}
                 <SafeImage
                   src={alert.snapshot}
                   alt={alert.animal}
@@ -150,7 +156,7 @@ export default function AlertScreen({ goBack }) {
               <div className="alert-content">
                 <div className="alert-message">{alert.message}</div>
                 <div className="alert-time">{alert.time}</div>
-                <div className="alert-meta"><small>Video: {alert.video}</small></div>
+                <div className="alert-meta"><small>Source: {alert.video}</small></div>
               </div>
             </li>
           ))}

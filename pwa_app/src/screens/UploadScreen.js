@@ -35,26 +35,31 @@ const UploadScreen = () => {
       const xhr = new XMLHttpRequest();
 
       xhr.upload.addEventListener("progress", (e) => {
-        if (e.lengthComputable) {
-          setProgress(Math.round((e.loaded / e.total) * 100));
+        if (e && e.lengthComputable && e.total) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          setProgress(percent);
         }
       });
 
       xhr.addEventListener("load", () => {
         setUploading(false);
-        if (xhr.status === 200) {
+        try {
           const data = JSON.parse(xhr.responseText);
-          setResult(data);
-          console.log("Detection results:", data);
-        } else {
-          const errorData = JSON.parse(xhr.responseText);
-          setError(errorData.message || "Upload failed");
+          if (xhr.status === 200) {
+            setResult(data);
+            console.log("Detection results:", data);
+          } else {
+            setError(data.message || data.error || `Upload failed (${xhr.status})`);
+          }
+        } catch (parseErr) {
+          console.error("Failed to parse response:", xhr.responseText);
+          setError("Server returned an unexpected response. Check the backend is running.");
         }
       });
 
       xhr.addEventListener("error", () => {
         setUploading(false);
-        setError("Network error. Please check your connection.");
+        setError("Network error. Please check your connection and that the backend is running on port 5001.");
       });
 
       xhr.open("POST", `${API_BASE}/api/uploads`);
@@ -91,6 +96,10 @@ const UploadScreen = () => {
     }
   };
 
+  // ── Snapshots come directly from result.snapshots (not result.detections.snapshots)
+  const snapshots = result?.snapshots ?? [];
+  const totalDetections = result?.detections?.total ?? result?.alerts?.length ?? 0;
+
   return (
     <div className="upload-container">
       <h2 className="upload-title">Upload Wildlife Videos</h2>
@@ -119,8 +128,8 @@ const UploadScreen = () => {
           <p className="file-name">
             Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
           </p>
-          <button 
-            className="clear-btn" 
+          <button
+            className="clear-btn"
             onClick={() => {
               setFile(null); setResult(null); setError(null); setProgress(0);
               const fileInput = document.getElementById("fileInput");
@@ -138,92 +147,116 @@ const UploadScreen = () => {
           <div className="progress-bar">
             <div className="progress-fill" style={{ width: `${progress}%` }}></div>
           </div>
-          <p className="progress-text">{progress < 100 ? `Uploading... ${progress}%` : "Processing video..."}</p>
+          <p className="progress-text">
+            {progress < 100 ? `Uploading... ${progress}%` : "Analysing video... this may take a minute ⏳"}
+          </p>
         </div>
       )}
 
-      <button 
-        className="upload-btn" 
+      <button
+        className="upload-btn"
         onClick={handleUpload}
         disabled={!file || uploading}
       >
         {uploading ? "⏳ Processing..." : "🚀 Upload Video"}
       </button>
 
-      {error && <div className="error-message"><p>❌ Error: {error}</p></div>}
+      {error && (
+        <div className="error-message">
+          <p>❌ Error: {error}</p>
+        </div>
+      )}
 
       <div className="results">
         <h3>Detection Results</h3>
-        {!result && !error && !uploading && <p className="no-results">No results yet. Upload a video to see detections.</p>}
+        {!result && !error && !uploading && (
+          <p className="no-results">No results yet. Upload a video to see detections.</p>
+        )}
 
         {result && result.success && (
           <div className="results-content">
             <div className="success-message">
-              ✅ Video processed successfully! Found {result.detections.total} detection(s)
+              ✅ Video processed successfully! Found {totalDetections} detection(s)
             </div>
 
-            {result.processing && (
+            {/* Video Info */}
+            {result.video && (
               <div className="info-card">
                 <h4>📹 Video Information</h4>
                 <div className="info-grid">
                   <div className="info-item">
                     <span className="info-label">Duration:</span>
-                    <span className="info-value">{result.processing.duration?.toFixed(1)}s</span>
+                    <span className="info-value">{result.video?.duration?.toFixed(1) ?? "N/A"}s</span>
                   </div>
                   <div className="info-item">
-                    <span className="info-label">FPS:</span>
-                    <span className="info-value">{result.processing.fps?.toFixed(1)}</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="info-label">Frames Processed:</span>
-                    <span className="info-value">{result.processing.processed_frames} / {result.processing.total_frames}</span>
+                    <span className="info-label">File:</span>
+                    <span className="info-value">{result.video?.originalName ?? file?.name}</span>
                   </div>
                 </div>
               </div>
             )}
 
-            {result.detections?.species_summary && Object.keys(result.detections.species_summary).length > 0 && (
+            {/* Species Summary */}
+            {result.detections?.speciesSummary && Object.keys(result.detections.speciesSummary).length > 0 && (
               <div className="info-card">
                 <h4>🦁 Species Detected</h4>
                 <div className="species-tags">
-                  {Object.entries(result.detections.species_summary).map(([species, count]) => (
+                  {Object.entries(result.detections.speciesSummary).map(([species, count]) => (
                     <span key={species} className="species-tag">{species}: {count}</span>
                   ))}
                 </div>
               </div>
             )}
 
+            {/* Alerts */}
             {result.alerts && result.alerts.length > 0 && (
               <div className="alert-card">
-                <h4>⚠️ High Priority Alerts</h4>
+                <h4>⚠️ Alerts</h4>
                 <div className="alerts-list">
                   {result.alerts.map((alert, idx) => (
-                    <div key={idx} className="alert-item">
-                      <strong>{alert.species}</strong> detected at {alert.timestamp.toFixed(1)}s (Frame {alert.frame})
+                    <div key={idx} className={`alert-item priority-${alert.priority}`}>
+                      <strong>{alert.species}</strong> — {alert.priority?.toUpperCase()} priority
+                      {" "}at {alert.timestamp?.toFixed(1)}s (Frame {alert.frame})
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {result.detections?.snapshots && result.detections.snapshots.length > 0 ? (
+            {/* Snapshots — uses result.snapshots directly (Cloudinary URLs) */}
+            {snapshots.length > 0 ? (
               <div className="snapshots-section">
-                <h4>📸 Detection Snapshots ({result.detections.snapshots.length})</h4>
+                <h4>📸 Detection Snapshots ({snapshots.length})</h4>
                 <div className="snapshots-grid">
-                  {result.detections.snapshots.map((snapshot, idx) => {
-                    const src = snapshot.path.startsWith('http') ? snapshot.path : `${API_BASE}${snapshot.path.startsWith('/') ? '' : '/'}${snapshot.path}`;
+                  {snapshots.map((snapshot, idx) => {
+                    // If Cloudinary migration is done, snapshot.path is already https://
+                    // If not, fall back to building the local URL
+                    const src = snapshot.path?.startsWith('http')
+                      ? snapshot.path
+                      : `${API_BASE}${snapshot.path?.startsWith('/') ? '' : '/'}${snapshot.path}`;
+
                     return (
                       <div key={idx} className="snapshot-card">
-                        <SafeImage src={src} alt={`Detection ${idx + 1}`} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+                        <SafeImage
+                          src={src}
+                          alt={`Detection ${idx + 1}`}
+                          style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                        />
                         <div className="snapshot-info">
                           <div className="snapshot-meta">
-                            Frame {snapshot.frame} • {snapshot.timestamp.toFixed(1)}s
+                            Frame {snapshot.frame} • {snapshot.timestamp?.toFixed(1)}s
                           </div>
                           <div className="detection-tags">
                             {snapshot.detections?.map((det, i) => (
-                              <span key={i} className="detection-tag">{det.species} ({(det.confidence*100).toFixed(0)}%)</span>
+                              <span key={i} className="detection-tag">
+                                {det.species} ({(det.confidence * 100).toFixed(0)}%)
+                              </span>
                             ))}
                           </div>
+                          {/* Show Cloudinary badge if image is from cloud */}
+                          {snapshot.path?.startsWith('http') && (
+                            <span className="cloud-badge">☁️ Cloud</span>
+                          )}
                         </div>
                       </div>
                     );
@@ -231,7 +264,7 @@ const UploadScreen = () => {
                 </div>
               </div>
             ) : (
-              <p className="no-results">No snapshots available</p>
+              <p className="no-results">No snapshots available for this detection.</p>
             )}
           </div>
         )}

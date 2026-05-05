@@ -8,7 +8,7 @@ const path = require("path");
 require("dotenv").config();
 const statsRoutes = require("./routes/stats");
 const newStatsRoutes = require("./routes/newstats");
-
+//const path = require("path"); 
 // Load environment variables
 const {
   MONGO_URI,
@@ -47,6 +47,7 @@ app.use(
       "http://localhost:3000",
       "http://localhost:3001",
       "http://localhost:5173",
+      "http://localhost:5001", 
       // Add Vercel domains (regex to match any Vercel subdomain)
       /https:\/\/.*\.vercel\.app$/,
       // Add ngrok domains (regex to match any ngrok subdomain)
@@ -56,9 +57,14 @@ app.use(
       FRONTEND_URL_ALT,
     ].filter(Boolean),
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "ngrok-skip-browser-warning"],
   })
 );
 app.use(express.json());
+
+// Handle OPTIONS preflight for ALL routes
+
 
 // ---------- Health check ----------
 app.get("/api/health", (_req, res) => {
@@ -109,6 +115,7 @@ app.use("/snapshots", express.static("snapshots"));
 app.use("/api/stats", statsRoutes);
 app.use("/api/newstats", newStatsRoutes);
 
+app.use("/snapshots", express.static(path.join(__dirname, "snapshots")));
 // ---------- MongoDB connection and server start ----------
 mongoose
   .connect(MONGO_URI)
