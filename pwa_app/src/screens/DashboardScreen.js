@@ -65,10 +65,10 @@ export default function DashboardScreen({ title = "Dashboard", onLogout }) {
           fetch(`${API_URL}/api/stats/detections-timeline?timeframe=${timeframe}`, {
             headers: getHeaders()
           }),
-          fetch(`${API_URL}/api/stats/species-breakdown`, {
+          fetch(`${API_URL}/api/stats/species-breakdown?timeframe=${timeframe}`, {
             headers: getHeaders()
           }),
-          fetch(`${API_URL}/api/stats/alert-outcomes`, {
+          fetch(`${API_URL}/api/stats/alert-outcomes?timeframe=${timeframe}`, {
             headers: getHeaders()
           }),
           fetch(`${API_URL}/api/stats/recent-detections?limit=3`, {

@@ -57,19 +57,19 @@ export default function AlertScreen({ goBack }) {
                 const normalizedSpecies = normalizeSpecies(alert.species);
                 
                 // Use the detection's creation date as the fallback
-                const alertDate = alert.timestamp ? new Date(alert.timestamp) : new Date(det.createdAt);
-
+                const alertDate = det.createdAt ? new Date(det.createdAt) : new Date();
                 formattedAlerts.push({
                   id: `${det._id}-${index}`,
                   animal: normalizedSpecies,
                   message: `${alert.priority === "high" ? "🚨" : "ℹ️"} ${normalizedSpecies} detected`,
                   
                   // This will now show the actual time of the upload
-                  time: alertDate.toLocaleTimeString("en-US", {
-                    hour: "numeric", 
-                    minute: "2-digit", 
-                    hour12: true,
-                  }),
+                  time: alertDate.toLocaleTimeString("en-KE", {
+                timeZone: "Africa/Nairobi",
+                hour: "numeric", 
+                minute: "2-digit", 
+                hour12: true,
+              }),
                   
                   snapshot: alert.image, 
                   video: det.video?.originalName || 'Processed Video',
@@ -79,7 +79,7 @@ export default function AlertScreen({ goBack }) {
               });
             }
           });
-          
+
           setAlerts(formattedAlerts);
           setLoading(false);
         })
