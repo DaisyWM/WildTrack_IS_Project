@@ -95,7 +95,7 @@ export default function ReportsScreen({ goBack }) {
                     <td>
                       {/* FIXED: SafeImage handles Cloudinary URL logic */}
                       <SafeImage
-                        src={r.snapshot?.startsWith('http') ? r.snapshot : `${API_BASE}${r.snapshot}`}
+                        src={r.image?.startsWith('http') ? r.image : `${API_BASE}${r.image}`}
                         alt="detection snapshot"
                         className="snapshot-img"
                       />
