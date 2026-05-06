@@ -4,7 +4,7 @@ export const VAPID_PUBLIC_KEY =
 
 // Your NEW ngrok URL
 //const NGROK_URL = "https://nontheosophic-lieselotte-morphogenetic.ngrok-free.dev";
-const NGROK_URL = "https://0c7a-105-164-14-121.ngrok-free.app";
+const NGROK_URL = "https://559e-105-164-14-121.ngrok-free.app";
 
 // Detect if running on localhost or deployed
 const hostname = window.location.hostname;
