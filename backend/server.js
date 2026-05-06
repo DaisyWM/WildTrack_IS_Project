@@ -7,7 +7,6 @@ const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
 const statsRoutes = require("./routes/stats");
-const newStatsRoutes = require("./routes/newstats");
 //const path = require("path"); 
 // Load environment variables
 const {
@@ -113,7 +112,6 @@ app.get("/api/detections/history", (req, res) => {
 // Serve snapshots folder as static files
 app.use("/snapshots", express.static("snapshots"));
 app.use("/api/stats", statsRoutes);
-app.use("/api/newstats", newStatsRoutes);
 
 app.use("/snapshots", express.static(path.join(__dirname, "snapshots")));
 // ---------- MongoDB connection and server start ----------

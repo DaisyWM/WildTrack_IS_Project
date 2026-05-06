@@ -45,7 +45,7 @@ const detectionSchema = new mongoose.Schema(
         path: String, // NOTE: This will now store the Cloudinary HTTPS URL
         cloudinaryId: String, // NEW: Stores the ID for easier management/deletion
         frame: Number,
-        timestamp: Number,
+        timestamp: Number, //record date and time
         alertLevel: { type: String, enum: ["low", "medium", "high"] },
         detections: [
           {

@@ -33,12 +33,12 @@ const payload = {
     alertLevel: alertLevel,
     tag: `detection-${species}-${Date.now()}`,
     requireInteraction: isHighPriority, // High alerts stay until dismissed
-    image: `http://localhost:5000${snapshotPath}` // Full image URL
+    image: `http://localhost:5001${snapshotPath}` // Full image URL
   }
 };
 
 // Send to backend API
-fetch('http://localhost:5000/api/push/send', {
+fetch('http://localhost:5001/api/push/send', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(payload)

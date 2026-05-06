@@ -1,0 +1,1122 @@
+[
+  {
+    "id": 1,
+    "video": "1777937120470_15291380_3840_2160_60fps.mov",
+    "timestamp": "2026-05-05T02:26:48.512896",
+    "snapshot": {
+      "file": "elephant_20260505_022528_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/elephant_20260505_022528_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.083415503875969,
+      "detections": [
+        {
+          "species": "elephant",
+          "confidence": 0.963,
+          "bbox": {
+            "x1": 740,
+            "y1": 308,
+            "x2": 937,
+            "y2": 503
+          }
+        },
+        {
+          "species": "elephant",
+          "confidence": 0.821,
+          "bbox": {
+            "x1": 182,
+            "y1": 296,
+            "x2": 557,
+            "y2": 614
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 0.083415503875969
+  },
+  {
+    "id": 2,
+    "video": "1777937120470_15291380_3840_2160_60fps.mov",
+    "timestamp": "2026-05-05T02:26:48.513024",
+    "snapshot": {
+      "file": "lion_20260505_022625_frame1650.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/lion_20260505_022625_frame1650.jpg",
+      "frame": 1650,
+      "timestamp": 27.52711627906977,
+      "detections": [
+        {
+          "species": "lion",
+          "confidence": 0.696,
+          "bbox": {
+            "x1": 215,
+            "y1": 305,
+            "x2": 623,
+            "y2": 626
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 27.52711627906977
+  },
+  {
+    "id": 3,
+    "video": "1777937120470_15291380_3840_2160_60fps.mov",
+    "timestamp": "2026-05-05T02:26:48.513029",
+    "snapshot": {
+      "file": "warthog_20260505_022635_frame1910.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/warthog_20260505_022635_frame1910.jpg",
+      "frame": 1910,
+      "timestamp": 31.864722480620156,
+      "detections": [
+        {
+          "species": "warthog",
+          "confidence": 0.512,
+          "bbox": {
+            "x1": 711,
+            "y1": 429,
+            "x2": 800,
+            "y2": 451
+          }
+        }
+      ],
+      "alertLevel": "low"
+    },
+    "detected_at": 31.864722480620156
+  },
+  {
+    "id": 4,
+    "video": "1777937445592_15338041_3840_2160_60fps.mov",
+    "timestamp": "2026-05-05T02:32:33.220500",
+    "snapshot": {
+      "file": "elephant_20260505_023047_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/elephant_20260505_023047_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.08341666666666667,
+      "detections": [
+        {
+          "species": "elephant",
+          "confidence": 0.866,
+          "bbox": {
+            "x1": 527,
+            "y1": 301,
+            "x2": 794,
+            "y2": 514
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 0.08341666666666667
+  },
+  {
+    "id": 5,
+    "video": "1777937445592_15338041_3840_2160_60fps.mov",
+    "timestamp": "2026-05-05T02:32:33.220524",
+    "snapshot": {
+      "file": "warthog_20260505_023152_frame2020.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/warthog_20260505_023152_frame2020.jpg",
+      "frame": 2020,
+      "timestamp": 33.70033333333333,
+      "detections": [
+        {
+          "species": "warthog",
+          "confidence": 0.527,
+          "bbox": {
+            "x1": 423,
+            "y1": 247,
+            "x2": 730,
+            "y2": 462
+          }
+        }
+      ],
+      "alertLevel": "low"
+    },
+    "detected_at": 33.70033333333333
+  },
+  {
+    "id": 6,
+    "video": "1777938779154_11528208-uhd_2158_3840_30fps.mov",
+    "timestamp": "2026-05-05T02:53:07.842222",
+    "snapshot": {
+      "file": "lion_20260505_025301_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/lion_20260505_025301_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16666666666666666,
+      "detections": [
+        {
+          "species": "lion",
+          "confidence": 0.932,
+          "bbox": {
+            "x1": 120,
+            "y1": 299,
+            "x2": 203,
+            "y2": 357
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 0.16666666666666666
+  },
+  {
+    "id": 7,
+    "video": "1777967958011_5146558-hd_1920_1080_25fps.mov",
+    "timestamp": "2026-05-05T10:59:30.717501",
+    "snapshot": {
+      "file": "zebra_20260505_105920_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/zebra_20260505_105920_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.2,
+      "detections": [
+        {
+          "species": "zebra",
+          "confidence": 0.958,
+          "bbox": {
+            "x1": 158,
+            "y1": 159,
+            "x2": 290,
+            "y2": 241
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.951,
+          "bbox": {
+            "x1": 305,
+            "y1": 140,
+            "x2": 359,
+            "y2": 238
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.924,
+          "bbox": {
+            "x1": 112,
+            "y1": 117,
+            "x2": 159,
+            "y2": 194
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.909,
+          "bbox": {
+            "x1": 467,
+            "y1": 123,
+            "x2": 541,
+            "y2": 182
+          }
+        }
+      ],
+      "alertLevel": "medium"
+    },
+    "detected_at": 0.2
+  },
+  {
+    "id": 8,
+    "video": "1777967958011_5146558-hd_1920_1080_25fps.mov",
+    "timestamp": "2026-05-05T10:59:30.717529",
+    "snapshot": {
+      "file": "warthog_20260505_105920_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/warthog_20260505_105920_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.2,
+      "detections": [
+        {
+          "species": "warthog",
+          "confidence": 0.803,
+          "bbox": {
+            "x1": 601,
+            "y1": 190,
+            "x2": 639,
+            "y2": 259
+          }
+        }
+      ],
+      "alertLevel": "low"
+    },
+    "detected_at": 0.2
+  },
+  {
+    "id": 9,
+    "video": "1777967958011_5146558-hd_1920_1080_25fps.mov",
+    "timestamp": "2026-05-05T10:59:30.717532",
+    "snapshot": {
+      "file": "background_20260505_105924_frame130.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/background_20260505_105924_frame130.jpg",
+      "frame": 130,
+      "timestamp": 5.2,
+      "detections": [
+        {
+          "species": "background",
+          "confidence": 0.736,
+          "bbox": {
+            "x1": 490,
+            "y1": 114,
+            "x2": 559,
+            "y2": 159
+          }
+        }
+      ],
+      "alertLevel": "low"
+    },
+    "detected_at": 5.2
+  },
+  {
+    "id": 10,
+    "video": "1777967958011_5146558-hd_1920_1080_25fps.mov",
+    "timestamp": "2026-05-05T10:59:30.717533",
+    "snapshot": {
+      "file": "lion_20260505_105926_frame185.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/lion_20260505_105926_frame185.jpg",
+      "frame": 185,
+      "timestamp": 7.4,
+      "detections": [
+        {
+          "species": "lion",
+          "confidence": 0.659,
+          "bbox": {
+            "x1": 72,
+            "y1": 21,
+            "x2": 96,
+            "y2": 36
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 7.4
+  },
+  {
+    "id": 11,
+    "video": "1777968313225_4829638-uhd_3840_2160_30fps.mov",
+    "timestamp": "2026-05-05T11:05:43.219355",
+    "snapshot": {
+      "file": "zebra_20260505_110515_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/zebra_20260505_110515_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16666666666666666,
+      "detections": [
+        {
+          "species": "zebra",
+          "confidence": 0.943,
+          "bbox": {
+            "x1": 433,
+            "y1": 150,
+            "x2": 553,
+            "y2": 210
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.93,
+          "bbox": {
+            "x1": 180,
+            "y1": 106,
+            "x2": 359,
+            "y2": 247
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.929,
+          "bbox": {
+            "x1": 0,
+            "y1": 98,
+            "x2": 131,
+            "y2": 343
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.907,
+          "bbox": {
+            "x1": 508,
+            "y1": 78,
+            "x2": 640,
+            "y2": 201
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.875,
+          "bbox": {
+            "x1": 460,
+            "y1": 97,
+            "x2": 582,
+            "y2": 200
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.851,
+          "bbox": {
+            "x1": 445,
+            "y1": 96,
+            "x2": 481,
+            "y2": 154
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.709,
+          "bbox": {
+            "x1": 219,
+            "y1": 107,
+            "x2": 277,
+            "y2": 139
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.665,
+          "bbox": {
+            "x1": 268,
+            "y1": 130,
+            "x2": 310,
+            "y2": 168
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.543,
+          "bbox": {
+            "x1": 269,
+            "y1": 105,
+            "x2": 360,
+            "y2": 169
+          }
+        }
+      ],
+      "alertLevel": "medium"
+    },
+    "detected_at": 0.16666666666666666
+  },
+  {
+    "id": 12,
+    "video": "1777968498087_4829638-uhd_3840_2160_30fps.mov",
+    "timestamp": "2026-05-05T11:08:58.850890",
+    "snapshot": {
+      "file": "zebra_20260505_110823_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/zebra_20260505_110823_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16666666666666666,
+      "detections": [
+        {
+          "species": "zebra",
+          "confidence": 0.943,
+          "bbox": {
+            "x1": 433,
+            "y1": 150,
+            "x2": 553,
+            "y2": 210
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.93,
+          "bbox": {
+            "x1": 180,
+            "y1": 106,
+            "x2": 359,
+            "y2": 247
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.929,
+          "bbox": {
+            "x1": 0,
+            "y1": 98,
+            "x2": 131,
+            "y2": 343
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.907,
+          "bbox": {
+            "x1": 508,
+            "y1": 78,
+            "x2": 640,
+            "y2": 201
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.875,
+          "bbox": {
+            "x1": 460,
+            "y1": 97,
+            "x2": 582,
+            "y2": 200
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.851,
+          "bbox": {
+            "x1": 445,
+            "y1": 96,
+            "x2": 481,
+            "y2": 154
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.709,
+          "bbox": {
+            "x1": 219,
+            "y1": 107,
+            "x2": 277,
+            "y2": 139
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.665,
+          "bbox": {
+            "x1": 268,
+            "y1": 130,
+            "x2": 310,
+            "y2": 168
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.543,
+          "bbox": {
+            "x1": 269,
+            "y1": 105,
+            "x2": 360,
+            "y2": 169
+          }
+        }
+      ],
+      "alertLevel": "medium"
+    },
+    "detected_at": 0.16666666666666666
+  },
+  {
+    "id": 13,
+    "video": "1777976762223_11760752-uhd_2160_4096_30fps.mov",
+    "timestamp": "2026-05-05T13:26:37.545609",
+    "snapshot": {
+      "file": "elephant_20260505_132605_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/elephant_20260505_132605_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16683333333333333,
+      "detections": [
+        {
+          "species": "elephant",
+          "confidence": 0.942,
+          "bbox": {
+            "x1": 0,
+            "y1": 153,
+            "x2": 293,
+            "y2": 570
+          }
+        },
+        {
+          "species": "elephant",
+          "confidence": 0.733,
+          "bbox": {
+            "x1": 202,
+            "y1": 331,
+            "x2": 332,
+            "y2": 482
+          }
+        },
+        {
+          "species": "elephant",
+          "confidence": 0.559,
+          "bbox": {
+            "x1": 0,
+            "y1": 361,
+            "x2": 77,
+            "y2": 493
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 0.16683333333333333
+  },
+  {
+    "id": 14,
+    "video": "1777976762223_11760752-uhd_2160_4096_30fps.mov",
+    "timestamp": "2026-05-05T13:26:37.545623",
+    "snapshot": {
+      "file": "zebra_20260505_132605_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/zebra_20260505_132605_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16683333333333333,
+      "detections": [
+        {
+          "species": "zebra",
+          "confidence": 0.857,
+          "bbox": {
+            "x1": 0,
+            "y1": 361,
+            "x2": 76,
+            "y2": 495
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.852,
+          "bbox": {
+            "x1": 280,
+            "y1": 363,
+            "x2": 334,
+            "y2": 469
+          }
+        }
+      ],
+      "alertLevel": "medium"
+    },
+    "detected_at": 0.16683333333333333
+  },
+  {
+    "id": 15,
+    "video": "1778000915655_4829638-uhd_3840_2160_30fps.mov",
+    "timestamp": "2026-05-05T20:10:26.063223",
+    "snapshot": {
+      "file": "zebra_20260505_201007_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/zebra_20260505_201007_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16666666666666666,
+      "detections": [
+        {
+          "species": "zebra",
+          "confidence": 0.943,
+          "bbox": {
+            "x1": 433,
+            "y1": 150,
+            "x2": 553,
+            "y2": 210
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.93,
+          "bbox": {
+            "x1": 180,
+            "y1": 106,
+            "x2": 359,
+            "y2": 247
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.929,
+          "bbox": {
+            "x1": 0,
+            "y1": 98,
+            "x2": 131,
+            "y2": 343
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.907,
+          "bbox": {
+            "x1": 508,
+            "y1": 78,
+            "x2": 640,
+            "y2": 201
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.875,
+          "bbox": {
+            "x1": 460,
+            "y1": 97,
+            "x2": 582,
+            "y2": 200
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.851,
+          "bbox": {
+            "x1": 445,
+            "y1": 96,
+            "x2": 481,
+            "y2": 154
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.709,
+          "bbox": {
+            "x1": 219,
+            "y1": 107,
+            "x2": 277,
+            "y2": 139
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.665,
+          "bbox": {
+            "x1": 268,
+            "y1": 130,
+            "x2": 310,
+            "y2": 168
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.543,
+          "bbox": {
+            "x1": 269,
+            "y1": 105,
+            "x2": 360,
+            "y2": 169
+          }
+        }
+      ],
+      "alertLevel": "medium"
+    },
+    "detected_at": 0.16666666666666666
+  },
+  {
+    "id": 16,
+    "video": "1778082653252_4829638-uhd_3840_2160_30fps.mov",
+    "timestamp": "2026-05-06T18:51:35.605375",
+    "snapshot": {
+      "file": "zebra_20260506_185117_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/zebra_20260506_185117_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16666666666666666,
+      "detections": [
+        {
+          "species": "zebra",
+          "confidence": 0.943,
+          "bbox": {
+            "x1": 433,
+            "y1": 150,
+            "x2": 553,
+            "y2": 210
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.93,
+          "bbox": {
+            "x1": 180,
+            "y1": 106,
+            "x2": 359,
+            "y2": 247
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.929,
+          "bbox": {
+            "x1": 0,
+            "y1": 98,
+            "x2": 131,
+            "y2": 343
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.907,
+          "bbox": {
+            "x1": 508,
+            "y1": 78,
+            "x2": 640,
+            "y2": 201
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.875,
+          "bbox": {
+            "x1": 460,
+            "y1": 97,
+            "x2": 582,
+            "y2": 200
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.851,
+          "bbox": {
+            "x1": 445,
+            "y1": 96,
+            "x2": 481,
+            "y2": 154
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.709,
+          "bbox": {
+            "x1": 219,
+            "y1": 107,
+            "x2": 277,
+            "y2": 139
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.665,
+          "bbox": {
+            "x1": 268,
+            "y1": 130,
+            "x2": 310,
+            "y2": 168
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.543,
+          "bbox": {
+            "x1": 269,
+            "y1": 105,
+            "x2": 360,
+            "y2": 169
+          }
+        }
+      ],
+      "alertLevel": "medium"
+    },
+    "detected_at": 0.16666666666666666
+  },
+  {
+    "id": 17,
+    "video": "1778082769426_11528208-uhd_2158_3840_30fps.mov",
+    "timestamp": "2026-05-06T18:52:58.339674",
+    "snapshot": {
+      "file": "lion_20260506_185254_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/lion_20260506_185254_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16666666666666666,
+      "detections": [
+        {
+          "species": "lion",
+          "confidence": 0.932,
+          "bbox": {
+            "x1": 120,
+            "y1": 299,
+            "x2": 203,
+            "y2": 357
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 0.16666666666666666
+  },
+  {
+    "id": 18,
+    "video": "1778082858325_11528208-uhd_2158_3840_30fps.mov",
+    "timestamp": "2026-05-06T18:54:27.567565",
+    "snapshot": {
+      "file": "lion_20260506_185423_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/lion_20260506_185423_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16666666666666666,
+      "detections": [
+        {
+          "species": "lion",
+          "confidence": 0.932,
+          "bbox": {
+            "x1": 120,
+            "y1": 299,
+            "x2": 203,
+            "y2": 357
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 0.16666666666666666
+  },
+  {
+    "id": 19,
+    "video": "1778082985634_11528208-uhd_2158_3840_30fps.mov",
+    "timestamp": "2026-05-06T18:56:34.385387",
+    "snapshot": {
+      "file": "lion_20260506_185630_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/lion_20260506_185630_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16666666666666666,
+      "detections": [
+        {
+          "species": "lion",
+          "confidence": 0.932,
+          "bbox": {
+            "x1": 120,
+            "y1": 299,
+            "x2": 203,
+            "y2": 357
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 0.16666666666666666
+  },
+  {
+    "id": 20,
+    "video": "1778084057995_13458026_1080_1920_60fps.mov",
+    "timestamp": "2026-05-06T19:15:13.239737",
+    "snapshot": {
+      "file": "elephant_20260506_191420_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/elephant_20260506_191420_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.0833327158810698,
+      "detections": [
+        {
+          "species": "elephant",
+          "confidence": 0.976,
+          "bbox": {
+            "x1": 129,
+            "y1": 190,
+            "x2": 312,
+            "y2": 519
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 0.0833327158810698
+  },
+  {
+    "id": 21,
+    "video": "1778095336332_15330234_2160_3840_30fps.mov",
+    "timestamp": "2026-05-06T22:23:03.494738",
+    "snapshot": {
+      "file": "background_20260506_222218_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/background_20260506_222218_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16683333333333333,
+      "detections": [
+        {
+          "species": "background",
+          "confidence": 0.64,
+          "bbox": {
+            "x1": 115,
+            "y1": 289,
+            "x2": 256,
+            "y2": 437
+          }
+        }
+      ],
+      "alertLevel": "low"
+    },
+    "detected_at": 0.16683333333333333
+  },
+  {
+    "id": 22,
+    "video": "1778095336332_15330234_2160_3840_30fps.mov",
+    "timestamp": "2026-05-06T22:23:03.494760",
+    "snapshot": {
+      "file": "lion_20260506_222222_frame10.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/lion_20260506_222222_frame10.jpg",
+      "frame": 10,
+      "timestamp": 0.33366666666666667,
+      "detections": [
+        {
+          "species": "lion",
+          "confidence": 0.782,
+          "bbox": {
+            "x1": 115,
+            "y1": 293,
+            "x2": 251,
+            "y2": 444
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 0.33366666666666667
+  },
+  {
+    "id": 23,
+    "video": "1778095336332_15330234_2160_3840_30fps.mov",
+    "timestamp": "2026-05-06T22:23:03.494762",
+    "snapshot": {
+      "file": "baboon_20260506_222235_frame675.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/baboon_20260506_222235_frame675.jpg",
+      "frame": 675,
+      "timestamp": 22.5225,
+      "detections": [
+        {
+          "species": "baboon",
+          "confidence": 0.544,
+          "bbox": {
+            "x1": 132,
+            "y1": 304,
+            "x2": 262,
+            "y2": 522
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 22.5225
+  },
+  {
+    "id": 24,
+    "video": "1778095336332_15330234_2160_3840_30fps.mov",
+    "timestamp": "2026-05-06T22:23:03.494763",
+    "snapshot": {
+      "file": "elephant_20260506_222249_frame1255.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/elephant_20260506_222249_frame1255.jpg",
+      "frame": 1255,
+      "timestamp": 41.875166666666665,
+      "detections": [
+        {
+          "species": "elephant",
+          "confidence": 0.758,
+          "bbox": {
+            "x1": 10,
+            "y1": 244,
+            "x2": 216,
+            "y2": 497
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 41.875166666666665
+  },
+  {
+    "id": 25,
+    "video": "1778095792508_4829638-uhd_3840_2160_30fps.mov",
+    "timestamp": "2026-05-06T22:30:16.377149",
+    "snapshot": {
+      "file": "zebra_20260506_222954_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/zebra_20260506_222954_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16666666666666666,
+      "detections": [
+        {
+          "species": "zebra",
+          "confidence": 0.943,
+          "bbox": {
+            "x1": 433,
+            "y1": 150,
+            "x2": 553,
+            "y2": 210
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.93,
+          "bbox": {
+            "x1": 180,
+            "y1": 106,
+            "x2": 359,
+            "y2": 247
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.929,
+          "bbox": {
+            "x1": 0,
+            "y1": 98,
+            "x2": 131,
+            "y2": 343
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.907,
+          "bbox": {
+            "x1": 508,
+            "y1": 78,
+            "x2": 640,
+            "y2": 201
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.875,
+          "bbox": {
+            "x1": 460,
+            "y1": 97,
+            "x2": 582,
+            "y2": 200
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.851,
+          "bbox": {
+            "x1": 445,
+            "y1": 96,
+            "x2": 481,
+            "y2": 154
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.709,
+          "bbox": {
+            "x1": 219,
+            "y1": 107,
+            "x2": 277,
+            "y2": 139
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.665,
+          "bbox": {
+            "x1": 268,
+            "y1": 130,
+            "x2": 310,
+            "y2": 168
+          }
+        },
+        {
+          "species": "zebra",
+          "confidence": 0.543,
+          "bbox": {
+            "x1": 269,
+            "y1": 105,
+            "x2": 360,
+            "y2": 169
+          }
+        }
+      ],
+      "alertLevel": "medium"
+    },
+    "detected_at": 0.16666666666666666
+  },
+  {
+    "id": 26,
+    "video": "1778096654871_11528208-uhd_2158_3840_30fps.mov",
+    "timestamp": "2026-05-06T22:44:25.045339",
+    "snapshot": {
+      "file": "lion_20260506_224416_frame5.jpg",
+      "path": "/Users/daisywambui/Projects/WildTrack_IS_Project/backend/snapshots/lion_20260506_224416_frame5.jpg",
+      "frame": 5,
+      "timestamp": 0.16666666666666666,
+      "detections": [
+        {
+          "species": "lion",
+          "confidence": 0.932,
+          "bbox": {
+            "x1": 120,
+            "y1": 299,
+            "x2": 203,
+            "y2": 357
+          }
+        }
+      ],
+      "alertLevel": "high"
+    },
+    "detected_at": 0.16666666666666666
+  }
+]

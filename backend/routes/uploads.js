@@ -58,6 +58,9 @@ const upload = multer({
  * POST /api/uploads
  * Upload video and run wildlife detection
  */
+
+// This route handles the video upload and starts the ML process
+
 router.post("/", upload.single("video"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ 
@@ -71,7 +74,7 @@ router.post("/", upload.single("video"), async (req, res) => {
 
   console.log(`[UPLOAD] Processing video: ${req.file.filename}`);
 
-  const python = spawn("python3", [pythonScript, videoPath]);
+  const python = spawn("python3", [pythonScript, videoPath]); //start the ml
 
   let dataString = "";
   let errorString = "";
@@ -109,7 +112,7 @@ router.post("/", upload.single("video"), async (req, res) => {
       const jsonString = lines.slice(jsonStart).join('\n');
       const result = JSON.parse(jsonString);
 
-      // ---------- NEW: CLOUD UPLOAD LOGIC ----------
+      // ---------- CLOUD UPLOAD LOGIC ----------
       // We map through the snapshots found by Python and upload them to Cloudinary
       const cloudSnapshots = await Promise.all(
         result.snapshots.map(async (snapshot) => {
