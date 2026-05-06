@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { API_BASE, getHeaders } from "../config/pushConfig";
 import SafeImage from "../components/SafeImage";
 
-// PROFESSIONAL CSS remains the same
+// PROFESSIONAL CSS r
 const reportsStyles = `
   .reports-container { padding: 20px 30px; }
   .reports-header { display: flex; align-items: center; margin-bottom: 25px; }
@@ -95,7 +95,7 @@ export default function ReportsScreen({ goBack }) {
                     <td>
                       {/* FIXED: SafeImage handles Cloudinary URL logic */}
                       <SafeImage
-                        src={r.image || r.snapshot}
+                        src={r.snapshot?.startsWith('http') ? r.snapshot : `${API_BASE}${r.snapshot}`}
                         alt="detection snapshot"
                         className="snapshot-img"
                       />
