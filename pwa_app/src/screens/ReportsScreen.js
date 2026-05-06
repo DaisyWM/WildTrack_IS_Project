@@ -27,7 +27,7 @@ export default function ReportsScreen({ goBack }) {
 
   useEffect(() => {
     // Using the same endpoint as your working Dashboard for consistency
-    fetch(`${API_BASE}/api/newstats/recent-detections?limit=200`, {
+    fetch(`${API_BASE}/api/stats/recent-detections?limit=200`, {
       headers: getHeaders(),
     })
       .then((res) => res.json())
